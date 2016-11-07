@@ -2,27 +2,33 @@ import numpy as np
 import cPickle as pickle
 np.random.seed(1337)  # for reproducibility
 
+import keras
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
+from keras.layers import Convolution2D, MaxPooling2D, LSTM, TimeDistributedDense
+from keras.layers.wrappers import Bidirectional
 from keras.utils import np_utils
 from keras import backend as K
+import tensorflow as tf
 import core.segment_batchiterator as seg_bi
 import core.speaker_train_splitter as sts
+tf.python.control_flow_ops = tf
+
 
 batch_size = 128
 nb_classes = 10
 nb_epoch = 12
-
+n_input = 128 # spect input (128*100)
+n_steps = 100 # timesteps
 
 
 # Load Training Data
-with open('../data/training/TIMIT_extracted/train_data_10_130ms_2.pickle', 'rb') as f:
+with open('../data/training/TIMIT_extracted/train_data_10_not_clustering_vs_reynolds.pickle', 'rb') as f:
     (X, y, speaker_names) = pickle.load(f)
 
 # Load test Data
-with open('../data/training/TIMIT_extracted/test_data_10_130ms_2.pickle', 'rb') as g:
+with open('../data/training/TIMIT_extracted/test_data_10_not_clustering_vs_reynolds.pickle', 'rb') as g:
     (Xt, yt, speaker_names_t) = pickle.load(g)
 
 # input image dimensions
@@ -34,14 +40,14 @@ pool_size = (4, 4)
 # convolution kernel size
 kernel_size = (3, 3)
 #input shape
-input_shape = (8, spect_height, spect_width)
+input_shape = (1, spect_height, spect_width)
 
 print X.shape
 
 
 # convert class vectors to binary class matrices
-y = np_utils.to_categorical(y, nb_classes)
-yt = np_utils.to_categorical(yt, nb_classes)
+#y = np_utils.to_categorical(y, nb_classes)
+#yt = np_utils.to_categorical(yt, nb_classes)
 
 #print y
 #print yt
@@ -51,17 +57,43 @@ model = Sequential()
 #layer 1
 model.add(Convolution2D(32, 8, 1, activation='relu',
                         border_mode='valid',
-                        input_shape=input_shape))
+                        input_shape=input_shape, dim_ordering="th"))
+model.add(Activation('relu'))
 #layer 2
 model.add(MaxPooling2D(pool_size=pool_size, strides=(2,2), dim_ordering="th"))
 #layer 3
 model.add(Convolution2D(64 ,8,1, activation='relu', dim_ordering="th"))
+model.add(Activation('relu'))
 #layer 4
 model.add(MaxPooling2D(pool_size=pool_size, strides=(2,2),dim_ordering="th"))
-#layer 4
-model.add(Dense(100))
-model.add(Bidirectional(LSTM(64)))
+#layer 5
+#model.add(Flatten())
+model.add(TimeDistributedDense(10*nb_classes))
+model.add(Activation('relu'))
+#Layer 6
+model.add(Dropout(0.50))
+#Layer 7
+#model.add(Dense(10*nb_classes/2))
+#model.add(Activation('relu'))
+#Layer 8
+#model.add(Dense(nb_classes))
+#model.add(Activation('softmax'))
+# LSTM LAyer
+model.add(LSTM(128 , input_length = 100))
+model.add(Dense(10))
+model.add(Activation('softmax'))
+get_3rd_layer_output = K.function([model.layers[0].input, K.learning_phase()],
+                                  [model.layers[3].output])
 
+
+print model.layers[5]
+print model.layers[5].output
+# output in test mode = 0
+#layer_output = get_3rd_layer_output([X, 0])[0]
+#print layer_output.shape
+# output in train mode = 1
+#layer_output = get_3rd_layer_output([X, 1])[0]
+#print layer_output.shape
 
 adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 
@@ -69,9 +101,53 @@ adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, 
 model.compile(loss='categorical_crossentropy',
               optimizer=adam,
               metrics=['accuracy'])
+batch_iterator_train = seg_bi.SegmentBatchIterator(batch_size=128)
+batch_iterator_test = seg_bi.SegmentBatchIterator(batch_size=128)
 
-#model.fit(X, Y, batch_size=batch_size, nb_epoch=nb_epoch,
-#          verbose=1, validation_data=(Xt, yt))
-#score = model.evaluate(Xt, yt, verbose=0)
-print('Test score:', score[0])
-print('Test accuracy:', score[1])
+
+def  transformy(y):
+    yn = np.zeros((batch_size, nb_classes))
+    k = 0
+    for v in y:
+      #print v
+        yn[k][v] =1
+        k +=1
+    return yn
+
+def generator():
+  while 1:
+    count = 1;
+    for batch_x, batch_y in batch_iterator_train(X, y):
+      batch_y = transformy(batch_y)
+      batch_x = batch_x.reshape((batch_size, n_steps, n_input))
+      yield (batch_x, batch_y)
+
+def valGenerator():
+  while 1:
+    count = 1;
+    for batch_xt, batch_yt in batch_iterator_test(Xt, yt):
+      batch_x = batch_x.reshape((batch_size, n_steps, n_input))
+      batch_yt = transformy(batch_yt)
+      yield (batch_xt, batch_yt)
+
+print "haha"
+
+#plot(model, to_file='model.png')
+
+
+history = model.fit_generator(generator(), 128, 10000, 
+              verbose=1, callbacks=[], validation_data=valGenerator(), 
+              nb_val_samples=128, class_weight=None, max_q_size=10, 
+              nb_worker=1, pickle_safe=False)
+
+
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train_acc', 'val_acc'], loc='upper left')
+plt.show()
+#history = model.fit(X, y, batch_size=batch_size, nb_epoch=nb_epoch, verbose=1, validation_data=(Xt, yt))
+score = model.evaluate(Xt, yt, verbose=1)
+#print('Test score:', score[0])
+#print('Test accuracy:', score[1])

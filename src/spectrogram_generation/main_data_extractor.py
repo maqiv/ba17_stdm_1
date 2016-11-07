@@ -13,16 +13,16 @@ import src.core.speaker_train_splitter as sts
 
 
 ##### ARGS
-MAX_SPEAKERS = 10
+MAX_SPEAKERS = 40
 WITH_SPLIT = True
-SPEAKER_LIST = '../../data/speaker_lists/speakers_10_not_clustering_vs_reynolds.txt'
-OUTPUT_1 = '../../data/training/TIMIT_extracted/train_data_10_130ms_2.pickle'
-OUTPUT_2 = '../../data/training/TIMIT_extracted/test_data_10_130ms_2.pickle'
+SPEAKER_LIST = '../../data/speaker_lists/speakers_40_clustering_vs_reynolds.txt'
+OUTPUT_1 = '../../data/training/TIMIT_extracted/train_data_40.pickle'
+OUTPUT_2 = '../../data/training/TIMIT_extracted/test_data_40.pickle'
 ###########
 
 
 ONE_SEC = settings.ONE_SEC # array elements corresponding to one sec
-STEP_SIZE = 13
+STEP_SIZE = 100
 SPECT_DIMENSION = (settings.FREQ_ELEMENTS, ONE_SEC)
 MAX_AUDIO_LENGTH = 800
 
