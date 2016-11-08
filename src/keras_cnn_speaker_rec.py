@@ -37,10 +37,10 @@ spect_height, spect_width = 128, 100
 # number of convolutional filters to use
 nb_filters = 32
 # size of pooling area for max pooling
-pool_size = (4, 1)
+pool_size = (4, 4)
 # convolution kernel size
 kernel_size = (3, 3)
-strides = (2,1)
+strides = (2,2)
 #input shape
 input_shape = (1, spect_height, spect_width)
 
@@ -138,13 +138,13 @@ def valGenerator():
 #plot(model, to_file='model.png')
 
 
-history = model.fit_generator(generator(), 128, 500, 
+history = model.fit_generator(generator(), 128, 1000, 
               verbose=1, callbacks=[], validation_data=valGenerator(), 
               nb_val_samples=128, class_weight=None, max_q_size=10, 
               nb_worker=1, pickle_safe=False)
 
 
-sav = "keras_CNN_BLSTM128_SP10_.png"
+sav = "keras_CNN_BLSTM128_SP10_pool(4_4).png"
 plt.plot(history.history['acc'])
 plt.plot(history.history['val_acc'])
 plt.ylabel('accuracy')
