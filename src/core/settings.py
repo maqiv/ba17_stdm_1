@@ -1,6 +1,10 @@
 ONE_SEC = 100 # spectrogram width
+INTERVALL = 15 # input data widht
 FREQ_ELEMENTS = 128 #spectrogram height
 SENTENCES_PER_SPEAKER = 10
 SENTENCES_TRAIN = 8
-NUM_OF_SPEAKERS = 40
-EXP_PATH = '/Users/yanicklukic/Google Drive/Carlo+Yanick/BA/experimente/'
+NUM_OF_SPEAKERS = 630
+LOG_PATH = '../data/experiments/logs/'
+NET_PATH = '../data/experiments/nets/'
+PLOT_PATH = '../data/experiments/plots/'
+DATA_PATH = '../data/training/TIMIT_extracted/'

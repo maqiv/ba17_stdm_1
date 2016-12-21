@@ -1,0 +1,8 @@
+#compiled python
+*.pyc
+
+#logs and training Data
+data/training/TIMIT
+data/training/TIMIT_extracted
+data/experiments
+

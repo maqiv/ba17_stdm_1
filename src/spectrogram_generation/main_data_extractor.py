@@ -2,28 +2,24 @@ import cPickle as pickle
 import sys
 
 import numpy as np
-
-sys.path.append("/home/patman/pa//1_code")
-sys.path.append("/home/patman/pa/1_code/src")
-sys.path.append("/home/patman/pa/1_code/src/spectorgram_converter")
-
 import data_extractor as de
-from src.core import settings
 import src.core.speaker_train_splitter as sts
 
 
 ##### ARGS
-MAX_SPEAKERS = 40
+SENTENCES_PER_SPEAKER = 10
+FREQ_ELEMENTS = 128
+MAX_SPEAKERS = 100
 WITH_SPLIT = True
-SPEAKER_LIST = '../../data/speaker_lists/speakers_40_clustering_vs_reynolds.txt'
-OUTPUT_1 = '../../data/training/TIMIT_extracted/train_data_40.pickle'
-OUTPUT_2 = '../../data/training/TIMIT_extracted/test_data_40.pickle'
+SPEAKER_LIST = '../../data/speaker_lists/speakers_100_61m_39w_v2.txt'
+OUTPUT_1 = '../../data/training/TIMIT_extracted/train_data_100.pickle'
+OUTPUT_2 = '../../data/training/TIMIT_extracted/test_data_100.pickle'
 ###########
 
 
-ONE_SEC = settings.ONE_SEC # array elements corresponding to one sec
+ONE_SEC = 100 # array elements corresponding to one sec
 STEP_SIZE = 100
-SPECT_DIMENSION = (settings.FREQ_ELEMENTS, ONE_SEC)
+SPECT_DIMENSION = (FREQ_ELEMENTS, ONE_SEC)
 MAX_AUDIO_LENGTH = 800
 
 extractor = de.DataExtractor(MAX_SPEAKERS, ONE_SEC, STEP_SIZE, SPECT_DIMENSION)
@@ -42,7 +38,7 @@ print X.shape
 print len(np.atleast_1d(y))
 
 if WITH_SPLIT:
-    speaker_train_split = sts.SpeakerTrainSplit(0.2, settings.SENTENCES_PER_SPEAKER)
+    speaker_train_split = sts.SpeakerTrainSplit(0.2, SENTENCES_PER_SPEAKER)
     X_train_valid, X_test, y_train_valid, y_test = speaker_train_split(X, y, None)
 
     print len(y_train_valid)
