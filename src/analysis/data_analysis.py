@@ -22,7 +22,15 @@ tf.python.control_flow_ops = tf
 net_name = "BiLSTM128_l2_150ms_sp630_ep4000"
 write_to_file = True
 
-
+'''
+calculates Accuracies for the provided Networks as welll as k2,3,5,10
+network_name: network_name of the network to laod from settings.NET_PATH
+test_data: test_data to load from settings.DATA_PATH
+one_file: Boolean expectet true if the network is saved in H5 format.
+write_to_file: True if Results should be logged to test_scores.txt in the settings.LOG_PATH
+is_LSTM: True if the tested Network requires Input shape for LSTM
+segment_size: Segement Size needs to be the same as was used during training.
+'''
 def calculate_test_acccuracies(network_name, test_data, one_file, write_to_file, is_LSTM, segment_size =15):
     with open(settings.DATA_PATH+test_data, 'rb') as f:
         (X, y, s_list) = pickle.load(f)
