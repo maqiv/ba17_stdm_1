@@ -16,8 +16,8 @@ class SpeakerTrainSplit(object):
         self.sentences = sentences
 
     def __call__(self, X, y, net=None):
-        valid_size = len(y) * self.eval_size
-        train_size = len(y) - valid_size
+        valid_size = int(len(y) * self.eval_size)
+        train_size = int(len(y) - valid_size)
         X_train = np.zeros((train_size, 1, X[0, 0].shape[0], X[0, 0].shape[1]), dtype=np.float32)
         X_valid = np.zeros((valid_size, 1, X[0, 0].shape[0], X[0, 0].shape[1]), dtype=np.float32)
         y_train = np.zeros(train_size, dtype=np.int32)

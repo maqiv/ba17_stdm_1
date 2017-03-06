@@ -107,8 +107,8 @@ def  transformy(y, batch_size, nb_classes):
 # splits the train data in the specified split. to get 6 training sentences and 2 validation use:
 # splitter(X,y, 0,25, 8)
 def splitter(X, y, split, sentences):
-    valid_size = len(y) * split
-    train_size = len(y) - valid_size
+    valid_size = int(len(y) * split)
+    train_size = int(len(y) - valid_size)
     X_train = np.zeros((train_size, 1, X[0, 0].shape[0], X[0, 0].shape[1]), dtype=np.float32)
     X_valid = np.zeros((valid_size, 1, X[0, 0].shape[0], X[0, 0].shape[1]), dtype=np.float32)
     y_train = np.zeros(train_size, dtype=np.int32)
