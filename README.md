@@ -1,6 +1,6 @@
-# PA - Speaker Identification mit Recurrent Neural Networks
-# Codebase
-# by Patrick Gerber
+# Speaker Identification mit Recurrent Neural Networks
+## PA Codebase
+by Patrick Gerber
 
 ### Required folder structure
 * data/experiments/logs/
