@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 import keras
 from keras.datasets import mnist
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, Flatten, Reshape
 from keras.layers import Convolution2D, MaxPooling2D, LSTM, TimeDistributedDense
 from keras.layers.wrappers import Bidirectional
@@ -55,6 +55,14 @@ def calculate_test_acccuracies(network_name, test_data, one_file, write_to_file,
     if is_LSTM == True :
         X_test = X_test.reshape(X_test.shape[0],X_test.shape[3], X_test.shape[2])
     print "Test output..."
+    im_model = Model(input = model.input, output = model.layers[2].output)
+    data_out = im_model.predict(X_test, batch_size= 128)
+    print data_out
+    da = np.asarray(data_out)
+    np.savetxt("foo.csv", da, delimiter=",")
+    with open(test_data+"cluster_out_01", 'wb') as f:
+        pickle.dump((da, y, s_list), f, -1)
+
     output = model.predict(X_test, batch_size=128, verbose= 1)
     y_t = np_utils.to_categorical(y_test, n_classes)
     eva = model.evaluate(X_test, y_t, batch_size=128, verbose = 2)

@@ -1,4 +1,6 @@
 import numpy as np
+import core.settings as settings
+import core.plot_saver as ps
 import cPickle as pickle
 np.random.seed(1337)  # for reproducibility
 import keras
@@ -69,31 +71,6 @@ class bilstm_2layer_dropout(object):
         net_saver = keras.callbacks.ModelCheckpoint("../data/experiments/nets/"+self.network_name+"_best.h5", monitor='val_loss', verbose=1, save_best_only=True)
         return [csv_logger, net_saver]
     
-    def save_plots(self, history):
-        sav = "../data/experiments/plots/"+self.network_name+"_acc.png"
-        fig = plt.figure()
-        ax = fig.gca()
-        ax.set_yticks(np.arange(0,1,0.1))
-        plt.plot(history.history['acc'])
-        plt.plot(history.history['val_acc'])
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
-        plt.legend(['train_acc', 'val_acc'], loc='lower right')
-        plt.grid()
-        plt.savefig(sav)
-        
-        
-        sav = "../data/experiments/plots/"+self.network_name+"_loss.png"
-        fig = plt.figure()
-        ax = fig.gca()
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        plt.legend(['train_acc', 'val_acc'], loc='lower left')
-        plt.grid()
-        plt.savefig(sav)
-    
     
     
     def run_network(self):
@@ -110,10 +87,12 @@ class bilstm_2layer_dropout(object):
                     verbose=2, callbacks=calls, validation_data=val_gen, 
                     nb_val_samples=batches_v, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
-        self.save_plots( history)
-        model.save("../data/experiments/nets/"+self.network_name+".h5")
-        da.calculate_test_acccuracies(self.network_name, self.test_data, True, True, True, segment_size=self.segment_size)    
-
+        ps.save_accuracy_plot(history, self.network_name)
+        ps.save_loss_plot(history, self.network_name)
+        print "saving model"
+        model.save(settings.NET_PATH+self.network_name+".h5")
+        print "evaluating model"
+        #da.calculate_test_acccuracies(self.network_name, self.test_data, True, True, True, segment_size=self.segment_size)
 
 
 

@@ -3,17 +3,17 @@ import sys
 
 import numpy as np
 import data_extractor as de
-import src.core.speaker_train_splitter as sts
+import speaker_train_splitter as sts
 
 
 ##### ARGS
 SENTENCES_PER_SPEAKER = 10
 FREQ_ELEMENTS = 128
-MAX_SPEAKERS = 100
+MAX_SPEAKERS = 40
 WITH_SPLIT = True
-SPEAKER_LIST = '../../data/speaker_lists/speakers_100_61m_39w_v2.txt'
-OUTPUT_1 = '../../data/training/TIMIT_extracted/train_data_100.pickle'
-OUTPUT_2 = '../../data/training/TIMIT_extracted/test_data_100.pickle'
+SPEAKER_LIST = '../../data/speaker_lists/speakers_40_clustering_vs_reynolds.txt'
+OUTPUT_1 = '../../data/training/TIMIT_extracted/train_clustering_40.pickle'
+OUTPUT_2 = '../../data/training/TIMIT_extracted/test_clustering_40.pickle'
 ###########
 
 
@@ -43,6 +43,8 @@ if WITH_SPLIT:
 
     print len(y_train_valid)
     print len(y_test)
+    print y_test
+    print y_train_valid
 
     with open(OUTPUT_1, 'wb') as f:
         pickle.dump((X_train_valid, y_train_valid, speaker_names), f, -1)
