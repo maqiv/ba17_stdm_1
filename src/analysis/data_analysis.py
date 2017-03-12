@@ -66,10 +66,10 @@ def calculate_test_acccuracies(network_name, test_data, one_file, write_to_file,
     output = model.predict(X_test, batch_size=128, verbose= 1)
     y_t = np_utils.to_categorical(y_test, n_classes)
     eva = model.evaluate(X_test, y_t, batch_size=128, verbose = 2)
-    k_nearest2 =  K.eval(metrics.top_k_categorical_accuracy(tf.pack(y_t),tf.pack(output), k=2))
-    k_nearest3 =  K.eval(metrics.top_k_categorical_accuracy(tf.pack(y_t),tf.pack(output), k=3))
-    k_nearest5 =  K.eval(metrics.top_k_categorical_accuracy(tf.pack(y_t),tf.pack(output), k=5))
-    k_nearest10 =  K.eval(metrics.top_k_categorical_accuracy(tf.pack(y_t),tf.pack(output), k=10))
+    k_nearest2 =  K.eval(metrics.top_k_categorical_accuracy(tf.stack(y_t),tf.stack(output), k=2))
+    k_nearest3 =  K.eval(metrics.top_k_categorical_accuracy(tf.stack(y_t),tf.stack(output), k=3))
+    k_nearest5 =  K.eval(metrics.top_k_categorical_accuracy(tf.stack(y_t),tf.stack(output), k=5))
+    k_nearest10 =  K.eval(metrics.top_k_categorical_accuracy(tf.stack(y_t),tf.stack(output), k=10))
     
     print output.shape
     output_sum = np.zeros((n_classes, n_classes))
