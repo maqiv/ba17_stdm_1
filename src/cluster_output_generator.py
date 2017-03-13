@@ -59,4 +59,5 @@ def generate_cluster_output(network_name, test_data, output_file, one_file, writ
 
 
 if __name__ == "__main__":
-    generate_cluster_output('cluster_train_dropout_500ms_256_100sp', 'test_clustering_40.pickle', 'test_cluster_out_40sp_500ms_256_100sp' True, True, True)
+    generate_cluster_output('cluster_train_dropout_500ms_512_100sp_best', 'test_clustering_10.pickle', 'test_cluster_out_10sp_500ms_512_100sp', True, True, True)
+    generate_cluster_output('cluster_train_dropout_500ms_512_100sp_best', 'train_clustering_10.pickle', 'train_cluster_out_10sp_500ms_512_100sp', True, True, True)
