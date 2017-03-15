@@ -41,7 +41,7 @@ def calc_MR(X, y, num_speakers, linkage_metric):
     i = 0
     for z in Z:
         clusters.append(clusters[int(z[0])] + clusters[int(z[1])])
-        print clusters[80+i]
+
         i += 1
 
     e = []
@@ -95,8 +95,8 @@ def load_data(train_file, test_file):
 
 if __name__ == "__main__":
     PATH = '../../data/experiments/cluster_outputs/'
-    TRAIN_FILE = 'train_output_40_clustering_vs_reynolds_with_dropout_v3.pickle'
-    TEST_FILE = 'test_output_40_clustering_vs_reynolds_with_dropout_v3.pickle'
+    TRAIN_FILE = 'test_cluster_out_120sp_500ms_256_400sp'
+    TEST_FILE = 'train_cluster_out_120sp_500ms_256_400sp'
     #TRAIN_FILE = 'train_cluster_out_40sp__256_500_100sp.pickle'
     #TEST_FILE = 'test_cluster_out_40sp__256_500_100sp.pickle'
     #train_output, test_output, train_speakers, test_speakers = load_data(PATH + TRAIN_FILE,
@@ -120,8 +120,8 @@ if __name__ == "__main__":
     #MRs = calc_MR(X, y, num_speakers, 'cosine')
     #plt.plot(MRs, label='128_500ms', linewidth=2)
 #
-    TRAIN_FILE = 'train_cluster_out_40sp__256_500.pickle'
-    TEST_FILE = 'test_cluster_out_40sp__256_500.pickle'
+    #TRAIN_FILE = 'train_cluster_out_40sp__256_500.pickle'
+    #TEST_FILE = 'test_cluster_out_40sp__256_500.pickle'
     train_output, test_output, train_speakers, test_speakers = load_data(PATH  + TRAIN_FILE,
                                                                         PATH  + TEST_FILE)
     X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)

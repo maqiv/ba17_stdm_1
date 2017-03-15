@@ -38,10 +38,10 @@ def extract_vectors(num_speakers, vec_size, vectors, y):
 
     TRAIN_FILE = 'train_cluster_out_40sp_500.pickle'
     TEST_FILE = 'test_cluster_out_40sp_500.pickle'
-with open('/home/patman/pa/1_Code/src/train_cluster_out_40sp__256_500.pickle', 'rb') as f:
+with open('../../data/experiments/cluster_outputs/train_cluster_out_40sp__256_500.pickle', 'rb') as f:
     test_output, test_speakers, speaker_names = pickle.load(f)
 
-with open('/home/patman/pa/1_Code/src/test_cluster_out_40sp__256_500.pickle', 'rb') as f:
+with open('../../data/experiments/cluster_outputs/test_cluster_out_40sp__256_500.pickle', 'rb') as f:
     train_output, train_speakers, _ = pickle.load(f)
 
 NUM_SPEAKERS = len(speaker_names)

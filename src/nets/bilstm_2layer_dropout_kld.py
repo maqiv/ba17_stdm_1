@@ -29,7 +29,7 @@ tf.python.control_flow_ops = tf
     frequency: size of the frequency Dimension of the Input Spectrogram
 
 '''
-class bilstm_2layer_dropout(object):
+class bilstm_2layer_dropout_kld(object):
 
     def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
         self.network_name = name
@@ -52,7 +52,7 @@ class bilstm_2layer_dropout(object):
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        model.compile(loss='categorical_crossentropy',
+        model.compile(loss='kullback_leibler_divergence',
                     optimizer=adam,
                     metrics=['accuracy'])
         return model

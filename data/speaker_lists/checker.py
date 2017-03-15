@@ -1,7 +1,7 @@
-with open('speakers_590_clustering_without_raynolds.txt', 'rb') as f:
+with open('/home/patman/pa/1_Code/data/speaker_lists/train_speakers_100_clustering.txt', 'rb') as f:
     v2 = f.readlines()
 
-with open('speakers_40_clustering_vs_reynolds.txt', 'rb') as f:
+with open('/home/patman/pa/1_Code/data/speaker_lists/speakers_80_clustering.txt', 'rb') as f:
     v3 = f.readlines()
 
 c = 0

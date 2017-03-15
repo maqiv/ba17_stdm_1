@@ -59,5 +59,17 @@ def generate_cluster_output(network_name, test_data, output_file, one_file, writ
 
 
 if __name__ == "__main__":
-    generate_cluster_output('cluster_train_dropout_500ms_512_100sp_best', 'test_clustering_10.pickle', 'test_cluster_out_10sp_500ms_512_100sp', True, True, True)
-    generate_cluster_output('cluster_train_dropout_500ms_512_100sp_best', 'train_clustering_10.pickle', 'train_cluster_out_10sp_500ms_512_100sp', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_clustering_10.pickle', 'test_cluster_out_10sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_clustering_10.pickle', 'train_cluster_out_10sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_clustering_40.pickle', 'test_cluster_out_40sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_clustering_40.pickle', 'train_cluster_out_40sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_clustering_80.pickle', 'test_cluster_out_80sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_clustering_80.pickle', 'train_cluster_out_80sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_test_clustering_100.pickle', 'test_cluster_out_100sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_100.pickle', 'train_cluster_out_100sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_test_clustering_120.pickle', 'test_cluster_out_120sp_500ms_256_400sp_kld', True, True, True)
+    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_120.pickle', 'train_cluster_out_120sp_500ms_256_400sp_kld', True, True, True)
+    generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_test_clustering_20.pickle', 'test_cluster_out_20sp_500ms_256_400sp_kld', True, True, True)
+    generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_20.pickle', 'train_cluster_out_20sp_500ms_256_400sp_kld', True, True, True)
+    generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_test_clustering_60.pickle', 'test_cluster_out_60sp_500ms_256_400sp_kld', True, True, True)
+    generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_60.pickle', 'train_cluster_out_60sp_500ms_256_400sp_kld', True, True, True)
