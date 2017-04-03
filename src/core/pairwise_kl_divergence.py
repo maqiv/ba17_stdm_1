@@ -60,8 +60,8 @@ def pairwise_kl_divergence(labels, predictions):
 if __name__ == "__main__":
     epsilon = 1e-16
     test_pred = [[1., 2., 3.], [4., 2., 3.], [6., 3., 2.]]
-    test_targ = [1, 1, 6]
-    #test_targ = [[1., 0., 0.], [1., 0., 0.], [0., 0., 1.]]
+    #test_targ = [1, 1, 6]
+    test_targ = [[1., 0., 0.], [1., 0., 0.], [0., 0., 1.]]
     test_margin = 2.
     predictions = tf.placeholder('float', [None, None])
     targets = tf.placeholder('float', [None])

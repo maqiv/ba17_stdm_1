@@ -73,7 +73,8 @@ class bilstm_2layer_dropout(object):
     def create_callbacks(self):
         csv_logger = keras.callbacks.CSVLogger('../data/experiments/logs/'+self.network_name+'.csv')
         net_saver = keras.callbacks.ModelCheckpoint("../data/experiments/nets/"+self.network_name+"_best.h5", monitor='val_loss', verbose=1, save_best_only=True)
-        return [csv_logger, net_saver]
+        tb = keras.callbacks.TensorBoard(log_dir='../data/experiments/graph', histogram_freq=5, write_graph=True, write_images=True)
+        return [csv_logger, net_saver, tb]
     
     
     
@@ -82,8 +83,8 @@ class bilstm_2layer_dropout(object):
         calls = self.create_callbacks()
         
         X_t, y_t, X_v, y_v = self.create_train_data()
-        train_gen = dg.batch_generator_lstm_v2(X_t, y_t, 128, segment_size=self.segment_size)
-        val_gen = dg.batch_generator_lstm_v2(X_v, y_v, 128, segment_size=self.segment_size)
+        train_gen = dg.batch_generator_lstm(X_t, y_t, 128, segment_size=self.segment_size)
+        val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
         batches_t = ((X_t.shape[0]+128 -1 )// 128)
         batches_v = ((X_v.shape[0]+128 -1 )// 128)
         
