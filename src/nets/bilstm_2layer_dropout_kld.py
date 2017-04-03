@@ -11,7 +11,7 @@ from keras.layers import Convolution2D, MaxPooling2D, LSTM, GRU
 from keras.layers.wrappers import Bidirectional
 from keras.utils import np_utils
 from keras import backend as K
-from keras import losses
+
 import tensorflow as tf
 import core.data_gen as dg
 import analysis.data_analysis as da

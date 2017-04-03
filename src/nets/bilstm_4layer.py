@@ -30,7 +30,7 @@ tf.python.control_flow_ops = tf
     segment_size: Segment size that is used as input 100 equals 1 second with current Spectrogram extraction
     frequency: size of the frequency Dimension of the Input Spectrogram
 '''
-class bilstm_3layer(object):
+class bilstm_4layer(object):
 
     def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_hidden3=128, n_hidden4=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
         self.network_name = name
@@ -50,8 +50,10 @@ class bilstm_3layer(object):
     def create_net(self):
         model = Sequential()
         model.add(Bidirectional(LSTM(self.n_hidden1, return_sequences=True), input_shape=self.input))
+        model.add(Dropout(50))
         model.add(Bidirectional(LSTM(self.n_hidden2, return_sequences=True)))
         model.add(Bidirectional(LSTM(self.n_hidden3, return_sequences=True)))
+        model.add(Dropout(50))
         model.add(Bidirectional(LSTM(self.n_hidden4)))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
