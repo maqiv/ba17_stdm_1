@@ -50,9 +50,12 @@ class bilstm_3layer(object):
     def create_net(self):
         model = Sequential()
         model.add(Bidirectional(LSTM(self.n_hidden1, return_sequences=True), input_shape=self.input))
+        model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden2, return_sequences=True)))
         model.add(Bidirectional(LSTM(self.n_hidden3, return_sequences=True)))
+        model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden4)))
+        model.add(Dense(10*self.n_classes))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)

@@ -23,23 +23,20 @@ tf.python.control_flow_ops = tf
     training_data: name of the Training data file, expected to be train_xxxx.pickle
     n_hidden1: Units of the first LSTM Layer
     n_hidden2: Units of the second LSTM Layer
-    n_hidden3: Units of the third LSTM Layer
-    n_hidden4: Units of the fourth LSTM Layer
     n_classes: Amount of output classes (Speakers in Trainingset)
     n_epoch: Number of Epochs to train the Network
     segment_size: Segment size that is used as input 100 equals 1 second with current Spectrogram extraction
     frequency: size of the frequency Dimension of the Input Spectrogram
-'''
-class bilstm_3layer(object):
 
-    def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_hidden3=128, n_hidden4=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
+'''
+class bilstm_2layer_dropout(object):
+
+    def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
         self.network_name = name
         self.training_data = training_data
         self.test_data = 'test'+training_data[5:]
         self.n_hidden1 = n_hidden1
         self.n_hidden2 = n_hidden2
-        self.n_hidden3 = n_hidden3
-        self.n_hidden4 = n_hidden4
         self.n_classes = n_classes
         self.n_epoch = n_epoch
         self.segment_size = segment_size
@@ -50,9 +47,10 @@ class bilstm_3layer(object):
     def create_net(self):
         model = Sequential()
         model.add(Bidirectional(LSTM(self.n_hidden1, return_sequences=True), input_shape=self.input))
-        model.add(Bidirectional(LSTM(self.n_hidden2, return_sequences=True)))
-        model.add(Bidirectional(LSTM(self.n_hidden3, return_sequences=True)))
-        model.add(Bidirectional(LSTM(self.n_hidden4)))
+        model.add(Dropout(0.50))
+        model.add(Bidirectional(LSTM(self.n_hidden2)))
+        model.add(Dense(self.n_classes*10))
+        model.add(Dense(self.n_classes*5))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
@@ -66,7 +64,7 @@ class bilstm_3layer(object):
         with open('../data/training/TIMIT_extracted/'+self.training_data, 'rb') as f:
           (X, y, speaker_names) = pickle.load(f)
     
-        X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.125, 8)
+        X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.2, 10)
         return X_t, y_t, X_v, y_v
     
     
@@ -93,11 +91,10 @@ class bilstm_3layer(object):
                     nb_worker=1, pickle_safe=False)
         ps.save_accuracy_plot(history, self.network_name)
         ps.save_loss_plot(history, self.network_name)
-        
         print "saving model"
         model.save(settings.NET_PATH+self.network_name+".h5")
-        #da.calculate_test_acccuracies(self.network_name, self.test_data, True, True, True, segment_size=self.segment_size)    
-
+        #print "evaluating model"
+        #da.calculate_test_acccuracies(self.network_name, self.test_data, True, True, True, segment_size=self.segment_size)
 
 
 
