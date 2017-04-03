@@ -5,7 +5,7 @@ import keras
 from keras.datasets import mnist
 from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, Flatten, Reshape
-from keras.layers import Convolution2D, MaxPooling2D, LSTM, TimeDistributedDense
+from keras.layers import LSTM
 from keras.layers.wrappers import Bidirectional
 from keras.utils import np_utils
 from keras.models import model_from_json
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import core.settings as settings
 from keras.models import load_model
 from keras import backend as K
-tf.python.control_flow_ops = tf
+#tf.python.control_flow_ops = tf
 
 net_name = "BiLSTM128_l2_150ms_sp630_ep4000"
 write_to_file = True
