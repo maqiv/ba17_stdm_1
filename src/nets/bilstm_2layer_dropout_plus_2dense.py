@@ -14,7 +14,8 @@ from keras import backend as K
 import tensorflow as tf
 import core.data_gen as dg
 import analysis.data_analysis as da
-tf.python.control_flow_ops = tf
+import core.pairwise_kl_divergence_test_forloop as kld
+#tf.python.control_flow_ops = tf
 
 
 '''This Class Trains a Bidirectional LSTM with 2 Layers and a Dropout Layer
@@ -50,11 +51,12 @@ class bilstm_2layer_dropout(object):
         model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden2)))
         model.add(Dense(self.n_classes*10))
+        model.add(Dropout(0.50))
         model.add(Dense(self.n_classes*5))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        model.compile(loss='categorical_crossentropy',
+        model.compile(loss=kld.pairwise_kl_divergence,
                     optimizer=adam,
                     metrics=['accuracy'])
         return model
@@ -82,12 +84,12 @@ class bilstm_2layer_dropout(object):
         X_t, y_t, X_v, y_v = self.create_train_data()
         train_gen = dg.batch_generator_lstm(X_t, y_t, 128, segment_size=self.segment_size)
         val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
-        batches_t = ((X_t.shape[0]+128 -1 )// 128)*128
-        batches_v = ((X_v.shape[0]+128 -1 )// 128)*128
+        batches_t = ((X_t.shape[0]+128 -1 )// 128) 
+        batches_v = ((X_v.shape[0]+128 -1 )// 128)
         
-        history = model.fit_generator(train_gen, batches_t, self.n_epoch, 
+        history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_epoch, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
-                    nb_val_samples=batches_v, class_weight=None, max_q_size=10, 
+                    validation_steps=5, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
         ps.save_accuracy_plot(history, self.network_name)
         ps.save_loss_plot(history, self.network_name)

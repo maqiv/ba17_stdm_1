@@ -7,14 +7,15 @@ import keras
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D, LSTM, GRU
+from keras.layers import LSTM, GRU
 from keras.layers.wrappers import Bidirectional
 from keras.utils import np_utils
 from keras import backend as K
 import tensorflow as tf
 import core.data_gen as dg
 import analysis.data_analysis as da
-tf.python.control_flow_ops = tf
+import core.pairwise_kl_divergence as kld
+#tf.python.control_flow_ops = tf
 
 
 '''This Class Trains a Bidirectional LSTM with 2 Layers and a Dropout Layer
@@ -58,7 +59,7 @@ class bilstm_4layer(object):
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        model.compile(loss='categorical_crossentropy',
+        model.compile(loss='kullback_leibler_divergence',
                     optimizer=adam,
                     metrics=['accuracy'])
         return model
@@ -86,12 +87,12 @@ class bilstm_4layer(object):
         X_t, y_t, X_v, y_v = self.create_train_data()
         train_gen = dg.batch_generator_lstm(X_t, y_t, 128, segment_size=self.segment_size)
         val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
-        batches_t = ((X_t.shape[0]+128 -1 )// 128)*128
-        batches_v = ((X_v.shape[0]+128 -1 )// 128)*128
+        batches_t = ((X_t.shape[0]+128 -1 )// 128)
+        batches_v = ((X_v.shape[0]+128 -1 )// 128)
         
-        history = model.fit_generator(train_gen, batches_t, self.n_epoch, 
+        history = model.fit_generator(train_gen, steps_per_epoch = batches_t, epochs = self.n_epoch, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
-                    nb_val_samples=batches_v, class_weight=None, max_q_size=10, 
+                    validation_steps=batches_v, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
         ps.save_accuracy_plot(history, self.network_name)
         ps.save_loss_plot(history, self.network_name)

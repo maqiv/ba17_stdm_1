@@ -9,11 +9,11 @@ import speaker_train_splitter as sts
 ##### ARGS
 SENTENCES_PER_SPEAKER = 10
 FREQ_ELEMENTS = 128
-MAX_SPEAKERS = 100
-WITH_SPLIT = False
-SPEAKER_LIST = '../../data/speaker_lists/speakers_100_50w_50m_not_reynolds.txt'
-OUTPUT_1 = '../../data/training/TIMIT_extracted/speakers_100_50w_50m_not_reynolds.pickle'
-OUTPUT_2 = '../../data/training/TIMIT_extracted/speakers_100_50w_50m_not_reynolds.pickle'
+MAX_SPEAKERS = 80
+WITH_SPLIT = True
+SPEAKER_LIST = '../../data/speaker_lists/speakers_80_clustering.txt'
+OUTPUT_1 = '../../data/training/TIMIT_extracted/train_speakers_80_clustering.pickle'
+OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_80_clustering.pickle'
 ###########
 
 
@@ -35,7 +35,6 @@ with open(SPEAKER_LIST, 'rb') as f:
 X, y, speaker_names = extractor.traverse_TIMIT_data('../../data/training/TIMIT/', X, y, valid_speakers)
 
 print X.shape
-print len(np.atleast_1d(y))
 
 if WITH_SPLIT:
     speaker_train_split = sts.SpeakerTrainSplit(0.2, SENTENCES_PER_SPEAKER)

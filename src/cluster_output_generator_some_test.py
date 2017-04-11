@@ -43,18 +43,19 @@ def generate_cluster_output(network_name, test_data, output_file, one_file, writ
     model.compile(loss=kld.pairwise_kl_divergence, optimizer='rmsprop', metrics=['accuracy', 'categorical_accuracy', ])
 
     print "Data extraction..."
-    X_test, y_test = dg.generate_test_data(X, y, segment_size)
+    train_gen = dg.batch_generator_lstm(X, y, 128, segment_size=segment_size)
+    X_test, y_test = train_gen.next()
+    X_tst, y_test = train_gen.next()
     n_classes = np.amax(y_test)+1
-    print X.shape
-    print X_test.shape
     print "Data extraction done!"
     if is_LSTM == True :
-        X_test = X_test.reshape(X_test.shape[0],X_test.shape[3], X_test.shape[2])
+        #X_test = X_test.reshape(X_test.shape[0],X_test.shape[3], X_test.shape[2])
+        print "not needed"    
     print "Test output..."
     print model.layers[1].output.get_shape()
     print model.layers[3].output.get_shape()
     print model.layers[4].output.get_shape()
-    im_model = Model(input = model.input, output = model.layers[2].output)
+    im_model = Model(input = model.input, output = model.layers[3].output)
     data_out = im_model.predict(X_test)
     da = np.asarray(data_out)
     print da.shape
@@ -63,7 +64,7 @@ def generate_cluster_output(network_name, test_data, output_file, one_file, writ
 
 
 if __name__ == "__main__":
-    #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_clustering_10.pickle', 'test_cluster_out_10sp_500ms_256_400sp_kld', True, True, True)
+    generate_cluster_output('pkl_test01', 'speakers_100_50w_50m_not_reynolds.pickle', 'test_for_kld_02.pickle', True, True, True)
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_clustering_10.pickle', 'train_cluster_out_10sp_500ms_256_400sp_kld', True, True, True)
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_clustering_40.pickle', 'test_cluster_out_40sp_500ms_256_400sp_kld', True, True, True)
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_clustering_40.pickle', 'train_cluster_out_40sp_500ms_256_400sp_kld', True, True, True)
@@ -77,12 +78,8 @@ if __name__ == "__main__":
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_20.pickle', 'train_cluster_out_20sp_500ms_256_400sp_kld', True, True, True)
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_test_clustering_60.pickle', 'test_cluster_out_60sp_500ms_256_400sp_kld', True, True, True)
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_60.pickle', 'train_cluster_out_60sp_500ms_256_400sp_kld', True, True, True)
-    generate_cluster_output('kld_clust_lstm2_dense_best', 'train_speakers_40_clustering_vs_reynolds.pickle', 'train_cluster_40_kld_lstm2d_lstm_out_best.pickel', True, True, True)
-    generate_cluster_output('kld_clust_lstm2_dense_best', 'test_speakers_40_clustering_vs_reynolds.pickle', 'test_cluster_40_kld_lstm2d_lstm_out_best.pickel', True, True, True)    
-    generate_cluster_output('kld_clust_lstm2_dense_best', 'train_speakers_60_clustering.pickle', 'train_cluster_60_kld_lstm2d_lstm_out_best.pickel', True, True, True)
-    generate_cluster_output('kld_clust_lstm2_dense_best', 'test_speakers_60_clustering.pickle', 'test_cluster_60_kld_lstm2d_lstm_out_best.pickel', True, True, True)
-    generate_cluster_output('kld_clust_lstm2_dense_best', 'train_speakers_80_clustering.pickle', 'train_cluster_80_kld_lstm2d_lstm_out_best.pickel', True, True, True)
-    generate_cluster_output('kld_clust_lstm2_dense_best', 'test_speakers_80_clustering.pickle', 'test_cluster_80_kld_lstm2d_lstm_out_best.pickel', True, True, True)
+    #generate_cluster_output('kldold_clust_lstm2_dense', 'train_speakers_40_clustering_vs_reynolds.pickle', 'train_cluster_40_lstm2d_layer_softmax_out.pickel', True, True, True)
+    #generate_cluster_output('kldold_clust_lstm2_dense', 'test_speakers_40_clustering_vs_reynolds.pickle', 'test_cluster_40_lstm2d_layer_softmax_out.pickel', True, True, True)
     #generate_cluster_output('kldold_clust_lstm4', 'train_speakers_40_clustering_vs_reynolds.pickle', 'train_cluster_40_lstm4_layer_lstm4_out.pickel', True, True, True)
     #generate_cluster_output('kldold_clust_lstm4', 'test_speakers_40_clustering_vs_reynolds.pickle', 'test_cluster_40_lstm4_layer_lstm4_out.pickel', True, True, True)
     #generate_cluster_output('kldold_clust_lstm4_dense', 'train_speakers_40_clustering_vs_reynolds.pickle', 'train_cluster_40_lstm4d_layer_lstm4_out.pickel', True, True, True)
