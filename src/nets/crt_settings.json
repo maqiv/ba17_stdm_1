@@ -3,7 +3,7 @@
     "segment_size" : 100,
     "total_speakers" : 100,
     "batch_size" : 128,
-    "batch_loops" : 5,
+    "batch_loops" : 10000,
     
     "log_dir" : "../data/tf_logs/",
     "ckpt_file_pfx" : "model.ckpt",
