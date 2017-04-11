@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[ ]:
-
 import os
 import json
 import time
@@ -16,8 +11,6 @@ with open('crt_settings.json') as json_settings_file:
     stngs = json.load(json_settings_file)
 
 
-# In[ ]:
-
 def tf_log_dir():
     current_workdir = os.getcwd()
     tstamp = int(time.time())
@@ -25,8 +18,8 @@ def tf_log_dir():
     dirty_path = os.path.join(current_workdir, stngs['log_dir'], sess_dir_name)
     return os.path.realpath(dirty_path)
 
-# Parse training data to matrices
 
+# Parse training data to matrices
 def create_train_data():
     with open(os.path.join(stngs['cnn']['train_data_path'], stngs['cnn']['train_data_file']), 'rb') as f:
       (X, y, speaker_names) = pickle.load(f)
@@ -34,8 +27,8 @@ def create_train_data():
     X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.125, 8)
     return X_t, y_t, X_v, y_v
 
-# Create data
 
+# Create training data
 X_t, y_t, X_v, y_v = create_train_data()
 train_gen = dg.batch_generator(X_t, y_t, batch_size=stngs['batch_size'], segment_size=stngs['segment_size'])
 val_gen = dg.batch_generator(X_v, y_v, batch_size=stngs['batch_size'], segment_size=stngs['segment_size'])
@@ -43,11 +36,7 @@ batches_t = ((X_t.shape[0]+128 -1 )// 128)*128
 batches_v = ((X_v.shape[0]+128 -1 )// 128)*128
 
 
-# In[ ]:
-
 # Create basic net infrastructure
-
-# Placeholders
 with tf.name_scope('Placeholders'):
     x_input = tf.placeholder(tf.float32, shape=(None, stngs['frequencies'], stngs['segment_size'], 1))
     out_labels = tf.placeholder(tf.float32, shape=(None, stngs['segment_size']))
@@ -79,20 +68,14 @@ with tf.name_scope('Softmax'):
     gru_soft_out = tf.layers.dense(inputs=gru_out, units=stngs['total_speakers'], activation=tf.nn.softmax)
 
 
-# In[ ]:
-
 # Cross entropy and optimizer
-
 with tf.name_scope('Optimizer'):
     cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=gru_soft_out, labels=out_labels))
     tf.summary.scalar('loss', cross_entropy)
     optimizer = tf.train.AdamOptimizer().minimize(cross_entropy)
 
 
-# In[ ]:
-
-# Training
-
+# CNN Training
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
@@ -134,28 +117,18 @@ for step in range(stngs['batch_loops']):
         ckpt_file = os.path.join(tb_log_dir, stngs['ckpt_file_pfx'])
         tb_saver.save(sess, ckpt_file, global_step=step)
 
+# Save the meta model
 model_meta_file = os.path.join(tb_log_dir, stngs['model_file_name'])
 tb_saver.save(sess, model_meta_file)
 
-
-# In[ ]:
-
+# Load data for GRU evaluation
 with open(os.path.join(stngs['gru']['data_path'], stngs['gru']['data_file']), 'rb') as f:
     (raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
     test_x_data, test_y_data = dg.generate_test_data(raw_x_data, raw_y_data, segment_size=stngs['segment_size'])
 
 net_output = gru_soft_out.eval(feed_dict={x_input: np.reshape(test_x_data, [196, 128, 100, 1])}, session=sess)
-#gru_output = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [196, 128, 100, 1]), out_labels: np.reshape(test_y_data[:100,], [-1, 100])}, session=sess)
 
-
-# In[ ]:
 
 # Write output file for clustering
 with open(os.path.join(stngs['cluster_output_path'], stngs['cluster_output_file']), 'wb') as f:
     pickle.dump((test_x_data, test_y_data, test_speaker_names), f, -1)
-
-
-# In[ ]:
-
-
-
