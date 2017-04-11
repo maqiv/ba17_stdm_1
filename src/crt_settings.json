@@ -1,0 +1,25 @@
+{
+    "frequencies" : 128,
+    "segment_size" : 100,
+    "total_speakers" : 100,
+    "batch_size" : 128,
+    "batch_loops" : 5,
+    
+    "log_dir" : "../data/tf_logs/",
+    "ckpt_file_pfx" : "model.ckpt",
+    "model_file_name" : "final_model.save",
+    
+    "cnn" : {
+        "train_data_path" : "../data/training/TIMIT_extracted/",
+        "train_data_file" : "train_data_100.pickle"
+    },
+    
+    "gru" : {
+        "neurons_number" : 256,
+        "data_path" : "../data/training/TIMIT_extracted/",
+        "data_file" : "test_speakers_40_clustering_vs_reynolds.pickle"
+    },
+    
+    "cluster_output_path" : "../data/experiments/cluster_outputs/",
+    "cluster_output_file" : "first_cluster_test.pickle"
+}
