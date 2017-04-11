@@ -1,8 +1,25 @@
-#compiled python
-*.pyc
+# logs and training Data
+data/
+!data/speaker_lists
 
-#logs and training Data
-data/training/TIMIT
-data/training/TIMIT_extracted
-data/experiments
+######## Python ########
 
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Jupyter Notebook files
+*.ipynb
+.ipynb_checkpoints
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+
+######## MacOS files ########
+.DS_Store
