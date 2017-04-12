@@ -85,8 +85,10 @@ class cnn_rnn_tf_0(object):
         # Cross entropy and optimizer
         print "Create optimizer and loss function"
         with tf.name_scope('Optimizer'):
+            print "Create cross entropy function"
             cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=gru_soft_out, labels=out_labels))
             tf.summary.scalar('loss', cross_entropy)
+            print "Create AdamOptimizer and add cross_entropy as minimize function"
             optimizer = tf.train.AdamOptimizer().minimize(cross_entropy)
         
         return optimizer, gru_soft_out, cross_entropy, x_input, out_labels
