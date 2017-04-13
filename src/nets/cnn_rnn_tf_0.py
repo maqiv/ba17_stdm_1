@@ -63,53 +63,55 @@ class cnn_rnn_tf_0(object):
     
     # Create basic net infrastructure
     def create_net(self):
-        cnn_rnn_tf_0.logger.info("Creating placeholders")
-        with tf.name_scope('Placeholders'):
-            x_input = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1))
-            out_labels = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_0.stngs['segment_size']))
+        with tf.device('/gpu:0'):
 
-        cnn_rnn_tf_0.logger.info("Creating first convolution layer")
-        with tf.name_scope('Convolution_1'):
-            conv1 = tf.layers.conv2d(inputs=x_input, filters=32, kernel_size=[8, 1], padding="same", activation=tf.nn.relu)
+            cnn_rnn_tf_0.logger.info("Creating placeholders")
+            with tf.name_scope('Placeholders'):
+                x_input = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1))
+                out_labels = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_0.stngs['segment_size']))
 
-        cnn_rnn_tf_0.logger.info("Creating first maxpooling layer")
-        with tf.name_scope('MaxPooling_1'):
-            pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[4, 4], strides=[2, 2])
+            cnn_rnn_tf_0.logger.info("Creating first convolution layer")
+            with tf.name_scope('Convolution_1'):
+                conv1 = tf.layers.conv2d(inputs=x_input, filters=32, kernel_size=[8, 1], padding="same", activation=tf.nn.relu)
 
-        cnn_rnn_tf_0.logger.info("Creating second convolution layer")
-        with tf.name_scope('Convolution_2'):
-            conv2 = tf.layers.conv2d(inputs=pool1, filters=64, kernel_size=[8, 1], padding="same", activation=tf.nn.relu)
+            cnn_rnn_tf_0.logger.info("Creating first maxpooling layer")
+            with tf.name_scope('MaxPooling_1'):
+                pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[4, 4], strides=[2, 2])
 
-        cnn_rnn_tf_0.logger.info("Creating second maxpooling layer")
-        with tf.name_scope('MaxPooling_2'):
-            pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[4, 4], strides=[2, 2])
+            cnn_rnn_tf_0.logger.info("Creating second convolution layer")
+            with tf.name_scope('Convolution_2'):
+                conv2 = tf.layers.conv2d(inputs=pool1, filters=64, kernel_size=[8, 1], padding="same", activation=tf.nn.relu)
 
-        cnn_rnn_tf_0.logger.info("Creating reshape layer between cnn and gru")
-        with tf.name_scope('Reshape'):
-            dim1 = int(pool2.shape[3] * pool2.shape[1])
-            dim2 = int(pool2.shape[2])
-            lstm_input = tf.reshape(pool2, [-1, dim1, dim2])
+            cnn_rnn_tf_0.logger.info("Creating second maxpooling layer")
+            with tf.name_scope('MaxPooling_2'):
+                pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[4, 4], strides=[2, 2])
 
-        cnn_rnn_tf_0.logger.info("Creating GRU neurons")
-        with tf.name_scope('GRU'):
-            x_gru = tf.unstack(lstm_input, lstm_input.get_shape()[1], 1)
-            gru_cell = tf.contrib.rnn.GRUCell(cnn_rnn_tf_0.stngs['gru']['neurons_number'])
-            dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
-            gru_out = dense[-1]
+            cnn_rnn_tf_0.logger.info("Creating reshape layer between cnn and gru")
+            with tf.name_scope('Reshape'):
+                dim1 = int(pool2.shape[3] * pool2.shape[1])
+                dim2 = int(pool2.shape[2])
+                lstm_input = tf.reshape(pool2, [-1, dim1, dim2])
 
-        cnn_rnn_tf_0.logger.info("Creating softmax layer")
-        with tf.name_scope('Softmax'):
-            gru_soft_out = tf.layers.dense(inputs=gru_out, units=cnn_rnn_tf_0.stngs['total_speakers'], activation=tf.nn.softmax)
+            cnn_rnn_tf_0.logger.info("Creating GRU neurons")
+            with tf.name_scope('GRU'):
+                x_gru = tf.unstack(lstm_input, lstm_input.get_shape()[1], 1)
+                gru_cell = tf.contrib.rnn.GRUCell(cnn_rnn_tf_0.stngs['gru']['neurons_number'])
+                dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
+                gru_out = dense[-1]
+
+            cnn_rnn_tf_0.logger.info("Creating softmax layer")
+            with tf.name_scope('Softmax'):
+                gru_soft_out = tf.layers.dense(inputs=gru_out, units=cnn_rnn_tf_0.stngs['total_speakers'], activation=tf.nn.softmax)
 
 
-        # Cross entropy and optimizer
-        cnn_rnn_tf_0.logger.info("Create optimizer and loss function")
-        with tf.name_scope('Optimizer'):
-            cnn_rnn_tf_0.logger.info("Create cross entropy function")
-            cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=gru_soft_out, labels=out_labels))
-            tf.summary.scalar('loss', cross_entropy)
-            cnn_rnn_tf_0.logger.info("Create AdamOptimizer and add cross_entropy as minimize function")
-            optimizer = tf.train.AdamOptimizer().minimize(cross_entropy)
+            # Cross entropy and optimizer
+            cnn_rnn_tf_0.logger.info("Create optimizer and loss function")
+            with tf.name_scope('Optimizer'):
+                cnn_rnn_tf_0.logger.info("Create cross entropy function")
+                cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=gru_soft_out, labels=out_labels))
+                tf.summary.scalar('loss', cross_entropy)
+                cnn_rnn_tf_0.logger.info("Create AdamOptimizer and add cross_entropy as minimize function")
+                optimizer = tf.train.AdamOptimizer().minimize(cross_entropy)
         
         return optimizer, gru_soft_out, cross_entropy, x_input, out_labels
 
@@ -126,7 +128,7 @@ class cnn_rnn_tf_0(object):
         
         # CNN Training
         cnn_rnn_tf_0.logger.info("Initialize tensorflow session")
-        sess = tf.Session()
+        sess = tf.Session(config=tf.ConfigProto(log_device_placement=true))
         sess.run(tf.global_variables_initializer())
 
         # Tensorboard
