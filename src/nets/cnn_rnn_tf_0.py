@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 import logging
@@ -21,13 +22,21 @@ class cnn_rnn_tf_0(object):
         self.run_network()
     
     def initialize_logger(self):
+        today_now = datetime.datetime.now()
+        date_time = '_{:04d}-{:02d}-{:02d}_{:02d}-{:02d}-{:02d}'.format(
+                            today_now.year, today_now.month, today_now.day,
+                            today_now.hour, today_now.minute, today_now.second)
+
+        # Standard output logger
+        stdout_log_file = os.path.join(cnn_rnn_tf_0.stngs['logging']['file_path'],
+                                        (cnn_rnn_tf_0.stngs['logging']['stdout_file_prefix'] + date_time + '.log'))
+        sys.stdout = open(stdout_log_file, 'w')
+        
+        # Python logger
         cnn_rnn_tf_0.logger = logging.getLogger(__name__)
         cnn_rnn_tf_0.logger.setLevel(logging.getLevelName(cnn_rnn_tf_0.stngs['logging']['level']))
 
-        today_now = datetime.datetime.now()
-        log_file_name = cnn_rnn_tf_0.stngs['logging']['file_name_prefix'] + '_{:04d}-{:02d}-{:02d}_{:02d}-{:02d}-{:02d}'.format(
-                            today_now.year, today_now.month, today_now.day,
-                            today_now.hour, today_now.minute, today_now.second) + '.log'
+        log_file_name = cnn_rnn_tf_0.stngs['logging']['file_name_prefix'] + date_time + '.log'
 
         log_file_path = os.path.join(cnn_rnn_tf_0.stngs['logging']['file_path'], log_file_name)
         log_file_handler = logging.FileHandler(log_file_path)
