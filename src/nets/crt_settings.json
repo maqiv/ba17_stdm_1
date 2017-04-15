@@ -18,11 +18,11 @@
 
     "cnn" : {
         "train_data_path" : "../data/training/TIMIT_extracted/",
-        "train_data_file" : "train_data_100.pickle"
+        "train_data_file" : "speakers_100_50w_50m_not_reynolds.pickle"
     },
     
     "gru" : {
-        "neurons_number" : 256,
+        "neurons_number" : 64,
         "data_path" : "../data/training/TIMIT_extracted/",
         "data_file" : "test_speakers_40_clustering_vs_reynolds.pickle"
     },

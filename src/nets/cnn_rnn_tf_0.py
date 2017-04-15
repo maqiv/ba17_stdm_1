@@ -16,10 +16,11 @@ class cnn_rnn_tf_0(object):
     logger = None
     
     def __init__(self, network_settings_file):
-        cnn_rnn_tf_0.stngs = self.load_settings(network_settings_file)
-        self.initialize_logger()
-        cnn_rnn_tf_0.logger.info("Calling run_network()")
-        self.run_network()
+        with tf.device('/gpu:0'):
+            cnn_rnn_tf_0.stngs = self.load_settings(network_settings_file)
+            self.initialize_logger()
+            cnn_rnn_tf_0.logger.info("Calling run_network()")
+            self.run_network()
     
     def initialize_logger(self):
         today_now = datetime.datetime.now()
@@ -121,8 +122,13 @@ class cnn_rnn_tf_0(object):
                 tf.summary.scalar('loss', cross_entropy)
                 cnn_rnn_tf_0.logger.info("Create AdamOptimizer and add cross_entropy as minimize function")
                 optimizer = tf.train.AdamOptimizer().minimize(cross_entropy)
+
+            with tf.name_scope('Accuracy'):
+                correct_pred = tf.equal(tf.argmax(gru_soft_out, 1), tf.argmax(out_labels, 1))
+                accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+                tf.summary.scalar('accuracy', accuracy)
         
-        return optimizer, gru_soft_out, cross_entropy, x_input, out_labels
+        return optimizer, gru_soft_out, cross_entropy, accuracy, x_input, out_labels
 
     
     def run_network(self):
@@ -130,14 +136,14 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger.info("Creating training batches")
         X_t, y_t, X_v, y_v = self.create_train_data()
         train_gen = dg.batch_generator(X_t, y_t, batch_size=cnn_rnn_tf_0.stngs['batch_size'], segment_size=cnn_rnn_tf_0.stngs['segment_size'])
-        
+        val_gen = dg.batch_generator(X_v, y_v, batch_size=cnn_rnn_tf_0.stngs['batch_size'], segment_size=cnn_rnn_tf_0.stngs['segment_size'])
         # Create network model and tensors
         cnn_rnn_tf_0.logger.info("Initialize network model")
-        optimizer, gru_soft_out, cross_entropy, x_input, out_labels = self.create_net()
+        optimizer, gru_soft_out, cross_entropy, accuracy, x_input, out_labels = self.create_net()
         
         # CNN Training
         cnn_rnn_tf_0.logger.info("Initialize tensorflow session")
-        sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+        sess = tf.Session(config=tf.ConfigProto(log_device_placement=True, allow_soft_placement = True))
         sess.run(tf.global_variables_initializer())
 
         # Tensorboard
@@ -156,20 +162,23 @@ class cnn_rnn_tf_0(object):
 
             # Get next batch
             x_b_t, y_b = train_gen.next()
+            x_vb_t, y_vb = val_gen.next()
             # Reshape the x_b batch with channel as last dimension
             x_b = np.reshape(x_b_t, [cnn_rnn_tf_0.stngs['batch_size'], cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1])
+            x_vb = np.reshape(x_b_t, [cnn_rnn_tf_0.stngs['batch_size'], cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1])
 
             # Execute training
             feed_dict = { x_input: x_b, out_labels: y_b }
             _, loss_value = sess.run([optimizer, cross_entropy], feed_dict=feed_dict, options=run_options, run_metadata=run_metadata)
 
-            # Define accuracy
-            correct_pred = tf.equal(tf.argmax(gru_soft_out, 1), tf.argmax(out_labels, 1))
-            accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
             sess_acc = sess.run(accuracy, feed_dict={ x_input: x_b, out_labels: y_b }, options=run_options, run_metadata=run_metadata)
             duration = time.time() - start_time
-            cnn_rnn_tf_0.logger.info('Round %d (%f s): accuracy %f', step, duration, sess_acc)
+
+            val_acc = sess.run(accuracy, feed_dict={ x_input: x_vb, out_labels: y_vb }, options=run_options, run_metadata=run_metadata)
+            val_loss =sess.run(cross_entropy, feed_dict={ x_input: x_vb, out_labels: y_vb }, options=run_options, run_metadata=run_metadata)
+
+            cnn_rnn_tf_0.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)
 
             if step % 10 == 0:
                 tb_summary_str = sess.run(tb_merged, feed_dict={ x_input: x_b, out_labels: y_b })
