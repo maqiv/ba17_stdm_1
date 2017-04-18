@@ -14,7 +14,7 @@ from keras import backend as K
 import tensorflow as tf
 import core.data_gen as dg
 import analysis.data_analysis as da
-import core.pairwise_kl_divergence_test_forloop as kld
+import core.pairwise_kl_divergence as kld
 #tf.python.control_flow_ops = tf
 
 

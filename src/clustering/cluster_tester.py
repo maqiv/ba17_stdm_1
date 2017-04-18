@@ -95,8 +95,8 @@ def load_data(train_file, test_file):
 
 if __name__ == "__main__":
     PATH = '../../data/experiments/cluster_outputs/lstm_2dense/'
-    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/train_cluster_80_kld_lstm2d_lstm_out_best.pickel'
-    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/test_cluster_80_kld_lstm2d_lstm_out_best.pickel'
+    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_80.pickel'
+    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_80.pickel'
     #TRAIN_FILE = 'train_cluster_out_40sp__256_500_100sp.pickle'
     #TEST_FILE = 'test_cluster_out_40sp__256_500_100sp.pickle'
     train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
@@ -111,15 +111,15 @@ if __name__ == "__main__":
     MRs = calc_MR(X, y, num_speakers, 'cosine')
     plt.plot(MRs, label='60sp', linewidth=2)
 #
-    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/train_cluster_60_kld_lstm2d_lstm_out_best.pickel'
-    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/test_cluster_60_kld_lstm2d_lstm_out_best.pickel'
+    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_60.pickel'
+    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_60.pickel'
     train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
     X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
     MRs = calc_MR(X, y, num_speakers, 'cosine')
     plt.plot(MRs, label='dense2', linewidth=2)
 #
-    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/train_cluster_40_kld_lstm2d_lstm_out_best.pickel'
-    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/test_cluster_40_kld_lstm2d_lstm_out_best.pickel'
+    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_40.pickel'
+    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_40.pickel'
     train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
     X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
     MRs = calc_MR(X, y, num_speakers, 'cosine')
