@@ -12,7 +12,7 @@
     "logging" : {
         "level" : "DEBUG",
         "file_path" : "../data/tf_logs/run_traces/",
-        "file_name_prefix" : "crt",
+        "file_name_prefix" : "crt"
     },
 
     "cnn" : {
