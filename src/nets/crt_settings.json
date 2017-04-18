@@ -17,7 +17,7 @@
 
     "cnn" : {
         "train_data_path" : "../data/training/TIMIT_extracted/",
-        "train_data_file" : "speakers_100_50w_50m_not_reynolds.pickle"
+        "train_data_file" : "train_data_100.pickle"
     },
     
     "gru" : {
