@@ -13,7 +13,6 @@
         "level" : "DEBUG",
         "file_path" : "../data/tf_logs/run_traces/",
         "file_name_prefix" : "crt",
-        "stdout_file_prefix" : "stdout"
     },
 
     "cnn" : {
