@@ -13,6 +13,7 @@ class cnn_rnn_tf_0(object):
     
     stngs = None
     logger = None
+    date_time = None
     
     def __init__(self, network_settings_file):
         cnn_rnn_tf_0.stngs = self.load_settings(network_settings_file)
@@ -22,7 +23,7 @@ class cnn_rnn_tf_0(object):
     
     def initialize_logger(self):
         today_now = datetime.datetime.now()
-        date_time = '_{:04d}-{:02d}-{:02d}_{:02d}-{:02d}-{:02d}'.format(
+        self.date_time = '_{:04d}-{:02d}-{:02d}_{:02d}-{:02d}-{:02d}'.format(
                             today_now.year, today_now.month, today_now.day,
                             today_now.hour, today_now.minute, today_now.second)
 
@@ -30,7 +31,7 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger = logging.getLogger(__name__)
         cnn_rnn_tf_0.logger.setLevel(logging.getLevelName(cnn_rnn_tf_0.stngs['logging']['level']))
 
-        log_file_name = cnn_rnn_tf_0.stngs['logging']['file_name_prefix'] + date_time + '.log'
+        log_file_name = cnn_rnn_tf_0.stngs['logging']['file_name_prefix'] + self.date_time + '.log'
 
         log_file_path = os.path.join(cnn_rnn_tf_0.stngs['logging']['file_path'], log_file_name)
         log_file_handler = logging.FileHandler(log_file_path)
@@ -119,7 +120,7 @@ class cnn_rnn_tf_0(object):
             accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
             tf.summary.scalar('accuracy', accuracy)
         
-        return optimizer, gru_soft_out, cross_entropy, accuracy, x_input, out_labels
+        return optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels
 
     
     def run_network(self):
@@ -130,7 +131,7 @@ class cnn_rnn_tf_0(object):
         val_gen = dg.batch_generator(X_v, y_v, batch_size=cnn_rnn_tf_0.stngs['batch_size'], segment_size=cnn_rnn_tf_0.stngs['segment_size'])
         # Create network model and tensors
         cnn_rnn_tf_0.logger.info("Initialize network model")
-        optimizer, gru_soft_out, cross_entropy, accuracy, x_input, out_labels = self.create_net()
+        optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels = self.create_net()
         
         # CNN Training
         cnn_rnn_tf_0.logger.info("Initialize tensorflow session")
@@ -167,11 +168,11 @@ class cnn_rnn_tf_0(object):
             duration = time.time() - start_time
 
             val_acc = sess.run(accuracy, feed_dict={ x_input: x_vb, out_labels: y_vb }, options=run_options, run_metadata=run_metadata)
-            val_loss =sess.run(cross_entropy, feed_dict={ x_input: x_vb, out_labels: y_vb }, options=run_options, run_metadata=run_metadata)
+            val_loss = sess.run(cross_entropy, feed_dict={ x_input: x_vb, out_labels: y_vb }, options=run_options, run_metadata=run_metadata)
 
             cnn_rnn_tf_0.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)
 
-            if step % 10 == 0:
+            if step % 20 == 0:
                 tb_summary_str = sess.run(tb_merged, feed_dict={ x_input: x_b, out_labels: y_b })
                 tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
                 tb_train_writer.add_summary(tb_summary_str, step)
@@ -186,16 +187,26 @@ class cnn_rnn_tf_0(object):
         model_meta_file = os.path.join(tb_log_dir, cnn_rnn_tf_0.stngs['model_file_name'])
         tb_saver.save(sess, model_meta_file)
 
-        # Load data for GRU evaluation
-        cnn_rnn_tf_0.logger.info("Loading data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['data_file']), 'rb') as f:
-            (raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
+        # Evaluate the network
+        cnn_rnn_tf_0.logger.info("Loading train data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['train_data_file']), 'rb') as f:
+            (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
-        net_output = gru_soft_out.eval(feed_dict={x_input: np.reshape(test_x_data, [196, 128, 100, 1])}, session=sess)
+        train_net_output = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
+        
+        cnn_rnn_tf_0.logger.info("Loading test data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['test_data_file']), 'rb') as f:
+            (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
+
+        test_net_output = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
 
 
         # Write output file for clustering
         cnn_rnn_tf_0.logger.info("Write outcome to pickle files for clustering")
-        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], cnn_rnn_tf_0.stngs['cluster_output_file']), 'wb') as f:
-            pickle.dump((test_x_data, test_y_data, test_speaker_names), f, -1)
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_train_file'] + self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((train_net_output, train_y_data, train_speaker_names), f, -1)
+        
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_test_file'] + self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((test_net_output, test_y_data, test_speaker_names), f, -1)
