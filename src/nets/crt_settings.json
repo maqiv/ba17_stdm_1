@@ -21,7 +21,7 @@
     },
     
     "gru" : {
-        "neurons_number" : 64,
+        "neurons_number" : 256,
         "data_path" : "../data/training/TIMIT_extracted/",
         "train_data_file" : "train_speakers_40_clustering_vs_reynolds.pickle",
         "test_data_file" : "test_speakers_40_clustering_vs_reynolds.pickle"
