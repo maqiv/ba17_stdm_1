@@ -5,13 +5,13 @@
     "batch_size" : 128,
     "batch_loops" : 10000,
     
-    "tf_log_dir" : "../data/tf_logs/",
+    "tf_log_dir" : "../data/experiments/logs/",
     "ckpt_file_pfx" : "model.ckpt",
     "model_file_name" : "final_model.save",
     
     "logging" : {
         "level" : "DEBUG",
-        "file_path" : "../data/tf_logs/run_traces/",
+        "file_path" : "../data/experiments/logs/run_traces/",
         "file_name_prefix" : "crt"
     },
 
