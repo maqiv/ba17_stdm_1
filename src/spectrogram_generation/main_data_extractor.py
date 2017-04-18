@@ -7,7 +7,7 @@ import speaker_train_splitter as sts
 
 
 ##### ARGS
-SENTENCES_PER_SPEAKER = 100
+SENTENCES_PER_SPEAKER = 10
 FREQ_ELEMENTS = 128
 MAX_SPEAKERS = 40
 WITH_SPLIT = True
