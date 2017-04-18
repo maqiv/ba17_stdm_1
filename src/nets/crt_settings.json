@@ -3,9 +3,10 @@
     "segment_size" : 100,
     "total_speakers" : 100,
     "batch_size" : 128,
-    "batch_loops" : 10000,
+    "batch_loops" : 50000,
     
     "tf_log_dir" : "../data/experiments/logs/",
+    "csv_file_pfx" : "csv_",
     "ckpt_file_pfx" : "model.ckpt",
     "model_file_name" : "final_model.save",
     
@@ -17,7 +18,7 @@
 
     "cnn" : {
         "train_data_path" : "../data/training/TIMIT_extracted/",
-        "train_data_file" : "train_data_100.pickle"
+        "train_data_file" : "speakers_100_50w_50m_not_reynolds.pickle"
     },
     
     "gru" : {
