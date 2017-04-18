@@ -89,8 +89,8 @@ class cnn_rnn_tf_0(object):
 
         cnn_rnn_tf_0.logger.info("Creating reshape layer between cnn and gru")
         with tf.name_scope('Reshape'):
-            dim1 = int(pool2.shape[3] * pool2.shape[1])
-            dim2 = int(pool2.shape[2])
+            dim1 = int(pool2.shape[2])
+            dim2 = int(pool2.shape[3] * pool2.shape[1])
             lstm_input = tf.reshape(pool2, [-1, dim1, dim2])
 
         cnn_rnn_tf_0.logger.info("Creating GRU neurons")
