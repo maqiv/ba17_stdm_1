@@ -172,7 +172,7 @@ class cnn_rnn_tf_0(object):
 
             cnn_rnn_tf_0.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)
 
-            if step % 10 == 0:
+            if step % 100 == 0:
                 tb_summary_str = sess.run(tb_merged, feed_dict={ x_input: x_b, out_labels: y_b })
                 tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
                 tb_train_writer.add_summary(tb_summary_str, step)
