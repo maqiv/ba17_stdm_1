@@ -134,7 +134,7 @@ class cnn_rnn_tf_0(object):
         
         # CNN Training
         cnn_rnn_tf_0.logger.info("Initialize tensorflow session")
-        sess = tf.Session(config=tf.ConfigProto())
+        sess = tf.Session()
         sess.run(tf.global_variables_initializer())
 
         # Tensorboard
