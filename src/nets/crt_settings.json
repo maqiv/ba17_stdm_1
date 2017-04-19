@@ -3,10 +3,10 @@
     "segment_size" : 100,
     "total_speakers" : 100,
     "batch_size" : 128,
-    "batch_loops" : 50000,
+    "batch_loops" : 23000,
     
     "tf_log_dir" : "../data/experiments/logs/",
-    "csv_file_pfx" : "csv_",
+    "csv_file_pfx" : "csv",
     "ckpt_file_pfx" : "model.ckpt",
     "model_file_name" : "final_model.save",
     
