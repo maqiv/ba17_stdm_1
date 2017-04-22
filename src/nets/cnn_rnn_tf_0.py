@@ -1,4 +1,5 @@
 import os
+import csv
 import json
 import time
 import logging
@@ -143,10 +144,20 @@ class cnn_rnn_tf_0(object):
         tb_merged = tf.summary.merge_all()
         tb_saver = tf.train.Saver()
         tb_log_dir = self.tf_log_dir()
-        tb_train_writer = tf.summary.FileWriter(tb_log_dir, sess.graph)
+
+        if not os.path.exists(tb_log_dir):
+            os.makedirs(tb_log_dir)
+
+        tb_train_log_dir = (tb_log_dir + '_train')
+        tb_train_writer = tf.summary.FileWriter(tb_train_log_dir, sess.graph)
+        tb_val_log_dir = (tb_log_dir + '_val')
+        tb_val_writer = tf.summary.FileWriter(tb_val_log_dir, sess.graph)
 
         run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
         run_metadata = tf.RunMetadata()
+
+        csv_file_handler = open(os.path.join(tb_log_dir, (cnn_rnn_tf_0.stngs['csv_file_pfx'] + self.date_time + '.csv')), 'a')
+        csv_writer = csv.writer(csv_file_handler)
 
         cnn_rnn_tf_0.logger.info("Start training")
         for step in range(cnn_rnn_tf_0.stngs['batch_loops']):
@@ -160,27 +171,35 @@ class cnn_rnn_tf_0(object):
             x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_0.stngs['batch_size'], cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1])
 
             # Execute training
-            feed_dict = { x_input: x_b, out_labels: y_b }
-            _, loss_value = sess.run([optimizer, cross_entropy], feed_dict=feed_dict, options=run_options, run_metadata=run_metadata)
+            train_feed_dict = { x_input: x_b, out_labels: y_b }
+            val_feed_dict = { x_input: x_vb, out_labels: y_vb }
 
+            _, loss_value = sess.run([optimizer, cross_entropy], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
+            sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
 
-            sess_acc = sess.run(accuracy, feed_dict={ x_input: x_b, out_labels: y_b }, options=run_options, run_metadata=run_metadata)
+            val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+            val_loss = sess.run(cross_entropy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+            
             duration = time.time() - start_time
-
-            val_acc = sess.run(accuracy, feed_dict={ x_input: x_vb, out_labels: y_vb }, options=run_options, run_metadata=run_metadata)
-            val_loss = sess.run(cross_entropy, feed_dict={ x_input: x_vb, out_labels: y_vb }, options=run_options, run_metadata=run_metadata)
-
             cnn_rnn_tf_0.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)
+            csv_writer.writerow([step, sess_acc, loss_value, val_acc, val_loss])
 
             if step % 100 == 0:
-                tb_summary_str = sess.run(tb_merged, feed_dict={ x_input: x_b, out_labels: y_b })
+                tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
                 tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
-                tb_train_writer.add_summary(tb_summary_str, step)
+                tb_train_writer.add_summary(tb_train_summary_str, step)
                 tb_train_writer.flush()
+
+                tb_val_summary_str = sess.run(tb_merged, feed_dict=val_feed_dict)
+                tb_val_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
+                tb_val_writer.add_summary(tb_val_summary_str, step)
+                tb_val_writer.flush()
 
             if step % 500 == 0:
                 ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_0.stngs['ckpt_file_pfx'])
                 tb_saver.save(sess, ckpt_file, global_step=step)
+
+        csv_file_handler.close()
 
         # Save the meta model
         cnn_rnn_tf_0.logger.info("Saving meta model")
