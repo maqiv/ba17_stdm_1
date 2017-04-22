@@ -95,35 +95,37 @@ def load_data(train_file, test_file):
 
 if __name__ == "__main__":
     PATH = '../../data/experiments/cluster_outputs/lstm_2dense/'
-    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_80.pickel'
-    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_80.pickel'
+    TRAIN_FILE = '/home/patman/Downloads/cluster_output_train_2017-04-18_12-11-11.pickle'
+    TEST_FILE = '/home/patman/Downloads/cluster_output_test_2017-04-18_12-11-11.pickle'
     #TRAIN_FILE = 'train_cluster_out_40sp__256_500_100sp.pickle'
     #TEST_FILE = 'test_cluster_out_40sp__256_500_100sp.pickle'
     train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
-    ##print train_output.shape
-    ##print test_output.shape
-    ##print test_speakers
-    ##print train_speakers
-    X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
-    ##print len(X)
+
+
+    print train_output.shape
+    print test_output.shape
+    print set(test_speakers)
+    print len(set(train_speakers))
+    X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 256)
+    print len(X)
     ##print len(y)
     ##print num_speakers
     MRs = calc_MR(X, y, num_speakers, 'cosine')
     plt.plot(MRs, label='60sp', linewidth=2)
 #
-    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_60.pickel'
-    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_60.pickel'
-    train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
-    X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
-    MRs = calc_MR(X, y, num_speakers, 'cosine')
-    plt.plot(MRs, label='dense2', linewidth=2)
-#
-    TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_40.pickel'
-    TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_40.pickel'
-    train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
-    X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
-    MRs = calc_MR(X, y, num_speakers, 'cosine')
-    plt.plot(MRs, label='dense1', linewidth=2)
+    #TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_60.pickel'
+    #TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_60.pickel'
+    #train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
+    #X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
+    #MRs = calc_MR(X, y, num_speakers, 'cosine')
+    #plt.plot(MRs, label='dense2', linewidth=2)
+##
+    #TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_train_cluster_40.pickel'
+    #TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/kld_run20170416_add_1000_test_cluster_40.pickel'
+    #train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
+    #X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
+    #MRs = calc_MR(X, y, num_speakers, 'cosine')
+    #plt.plot(MRs, label='dense1', linewidth=2)
 #
     #TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/train_cluster_40_kld_lstm2d_layer_lstm_out.pickel'
     #TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/test_cluster_kld_40_lstm2d_layer_lstm_out.pickel'

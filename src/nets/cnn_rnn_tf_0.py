@@ -157,7 +157,7 @@ class cnn_rnn_tf_0(object):
             x_vb_t, y_vb = val_gen.next()
             # Reshape the x_b batch with channel as last dimension
             x_b = np.reshape(x_b_t, [cnn_rnn_tf_0.stngs['batch_size'], cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1])
-            x_vb = np.reshape(x_b_t, [cnn_rnn_tf_0.stngs['batch_size'], cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1])
+            x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_0.stngs['batch_size'], cnn_rnn_tf_0.stngs['frequencies'], cnn_rnn_tf_0.stngs['segment_size'], 1])
 
             # Execute training
             feed_dict = { x_input: x_b, out_labels: y_b }
