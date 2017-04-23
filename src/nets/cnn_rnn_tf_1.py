@@ -133,7 +133,7 @@ class cnn_rnn_tf_0(object):
         val_gen = dg.batch_generator(X_v, y_v, batch_size=cnn_rnn_tf_0.stngs['batch_size'], segment_size=cnn_rnn_tf_0.stngs['segment_size'])
         # Create network model and tensors
         cnn_rnn_tf_0.logger.info("Initialize network model")
-        optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels = self.create_net()
+        optimizer, gru_soft_out, gru_out, kld_loss, accuracy, x_input, out_labels = self.create_net()
         
         # CNN Training
         cnn_rnn_tf_0.logger.info("Initialize tensorflow session")
