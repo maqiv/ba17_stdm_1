@@ -112,7 +112,7 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger.info("Create optimizer and loss function")
         with tf.name_scope('Optimizer'):
             cnn_rnn_tf_0.logger.info("Create kld function")
-            kld_loss = kld.pairwise_kl_divergence(out_labels, out)
+            kld_loss = kld.pairwise_kl_divergence(out_labels, gru_soft_out)
             tf.summary.scalar('loss', kld_loss)
             cnn_rnn_tf_0.logger.info("Create AdamOptimizer and add kld_loss as minimize function")
             optimizer = tf.train.AdamOptimizer().minimize(kld_loss)
