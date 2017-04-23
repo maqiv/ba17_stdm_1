@@ -6,7 +6,7 @@ import logging
 import datetime
 import numpy as np
 import tensorflow as tf
-
+import core.pairwise_kl_divergence as kld
 import core.data_gen as dg
 import cPickle as pickle
 
@@ -114,17 +114,17 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger.info("Create optimizer and loss function")
         with tf.name_scope('Optimizer'):
             cnn_rnn_tf_0.logger.info("Create cross entropy function")
-            cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=out, labels=out_labels))
-            tf.summary.scalar('loss', cross_entropy)
+            kld_loss = kld.pairwise_kl_divergence(out_labels, out)
+            tf.summary.scalar('loss', kld_loss)
             cnn_rnn_tf_0.logger.info("Create AdamOptimizer and add cross_entropy as minimize function")
-            optimizer = tf.train.AdamOptimizer().minimize(cross_entropy)
+            optimizer = tf.train.AdamOptimizer().minimize(kld_loss)
 
         with tf.name_scope('Accuracy'):
             correct_pred = tf.equal(tf.argmax(out, 1), tf.argmax(out_labels, 1))
             accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
             tf.summary.scalar('accuracy', accuracy)
         
-        return optimizer, lstm_out, dense1, dense2, out, cross_entropy, accuracy, x_input, out_labels
+        return optimizer, lstm_out, dense1, dense2, out, kld_loss, accuracy, x_input, out_labels
 
     
     def run_network(self):
@@ -135,7 +135,7 @@ class cnn_rnn_tf_0(object):
         val_gen = dg.batch_generator_lstm(X_v, y_v, batch_size=cnn_rnn_tf_0.stngs['batch_size'], segment_size=cnn_rnn_tf_0.stngs['segment_size'])
         # Create network model and tensors
         cnn_rnn_tf_0.logger.info("Initialize network model")
-        optimizer, lstm_out, dense1, dense2, out, cross_entropy, accuracy, x_input, out_labels = self.create_net()
+        optimizer, lstm_out, dense1, dense2, out, kld_loss, accuracy, x_input, out_labels = self.create_net()
         
         # CNN Training
         cnn_rnn_tf_0.logger.info("Initialize tensorflow session")
@@ -177,11 +177,11 @@ class cnn_rnn_tf_0(object):
             train_feed_dict = { x_input: x_b, out_labels: y_b }
             val_feed_dict = { x_input: x_vb, out_labels: y_vb }
 
-            _, loss_value = sess.run([optimizer, cross_entropy], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
+            _, loss_value = sess.run([optimizer, kld_loss], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
             sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
 
             val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
-            val_loss = sess.run(cross_entropy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+            val_loss = sess.run(kld_loss, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
             
             duration = time.time() - start_time
             cnn_rnn_tf_0.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)

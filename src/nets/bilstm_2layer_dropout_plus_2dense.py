@@ -51,7 +51,7 @@ class bilstm_2layer_dropout(object):
         model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden2)))
         model.add(Dense(self.n_classes*10))
-        #model.add(Dropout(0.50))
+        model.add(Dropout(0.50))
         model.add(Dense(self.n_classes*5))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))

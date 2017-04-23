@@ -26,6 +26,10 @@
         "data_path" : "../data/training/TIMIT_extracted/",
         "train_data_file" : "train_speakers_40_clustering_vs_reynolds.pickle",
         "test_data_file" : "test_speakers_40_clustering_vs_reynolds.pickle"
+        "train_data_file_60sp" : "train_speakers_60_clustering.pickle.pickle",
+        "test_data_file_60sp" : "test_speakers_60_clustering.pickle.pickle",
+        "train_data_file_80sp" : "train_speakers_80_clustering.pickle.pickle",
+        "test_data_file_80sp" : "test_speakers_80_clustering.pickle.pickle"
     },
     
     "cluster_output_path" : "../data/experiments/cluster_outputs/",
