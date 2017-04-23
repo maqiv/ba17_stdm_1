@@ -6,6 +6,7 @@ import logging
 import datetime
 import numpy as np
 import tensorflow as tf
+import core.pairwise_kl_divergence as kld
 
 import core.data_gen as dg
 import cPickle as pickle
