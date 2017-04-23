@@ -40,14 +40,15 @@ def outerLoop(x, tf_l, predictions, labels, margin):
 
         def innerLoop(y,x, tf_l, predictions, labels, margin):
             with tf.device('/cpu:0'):
-                tf_l = tf.add(tf_l, loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin))
+                #tf.cond(tf.locical_and(tf.equal(xq, xp), tf.less(y, x)),loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero)
+                tf_l = tf.add(tf_l, tf.cond(tf.greater(y,x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
                 y += 1
                 return y, x, tf_l, predictions, labels, margin
     
         def innerLoop_cond(y ,x, tf_l, predictions, labels, margin):
             with tf.device('/cpu:0'):
                 return tf.less(y, tf.shape(predictions)[0])
-    
+        
         y = tf.constant(0)
         res = tf.while_loop(innerLoop_cond, innerLoop, [y,x,tf_l, predictions, labels, margin], name='innerloop')
         return tf.add(x, 1), res[2], predictions, labels, margin
@@ -58,12 +59,16 @@ def outerLoop_condition(x, tf_l, predictions, labels, margin):
 
 def pairwise_kl_divergence(labels, predictions):
     with tf.device('/cpu:0'):
-        #x = tf.constant(0)
+        x = tf.constant(0)
         #margin = tf.constant(2.)
         #loss = tf.Variable(0.)
         #tf_l = tf.Variable(0. , name='loss')
         sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], name='outerloop')
-        loss = tf.div(sum_loss[1], (tf.to_float(tf.shape(predictions)[0]) *2.))
+        n = tf.to_float(tf.shape(predictions)[0])
+        print n
+        pairs = n*(n-1) / 2.
+        print pairs
+        loss = tf.div(sum_loss[1], pairs)
         print loss
         return loss
     
@@ -72,9 +77,9 @@ if __name__ == "__main__":
         (X, y, s_list) = pickle.load(f)
 
     epsilon = 1e-16
-    test_pred = [[1., 2., 3.], [4., 2., 3.], [6., 3., 2.]]
+    test_pred = [[1., 2., 3.], [4., 2., 3.], [6., 3., 2.], [4., 1., 5.], [2., 5., 8.]]
     #test_targ = [1, 1, 6]
-    test_targ = [[1., 0., 0.], [1., 0., 0.], [0., 0., 1.]]
+    test_targ = [[1., 0., 0.], [1., 0., 0.], [0., 0., 1.], [0., 1., 0.], [0., 1. , 0.]]
     test_margin = 2.
     predictions = tf.placeholder('float', [None, None])
     targets = tf.placeholder('float', [None, None])
@@ -84,8 +89,6 @@ if __name__ == "__main__":
     margin = tf.stack(test_margin)
     result = pairwise_kl_divergence(targets, predictions)
     sess = tf.Session()
-    sess = tf_debug.LocalCLIDebugWrapperSession(sess)
-    sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
     init = tf.global_variables_initializer()
     sess.run(init)
     summary = tf.summary.merge_all()
