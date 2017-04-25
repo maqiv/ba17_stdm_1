@@ -162,31 +162,36 @@ class cnn_rnn_tf_1(object):
 
         cnn_rnn_tf_1.logger.info("Start training")
         for step in range(cnn_rnn_tf_1.stngs['batch_loops']):
-            if (step + 1) % 10 == 0:
+            do_validation = (step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0)
+
+            if do_validation:
                 start_time = time.time()
 
             # Get next batch
             x_b_t, y_b = train_gen.next()
-            x_vb_t, y_vb = val_gen.next()
             # Reshape the x_b batch with channel as last dimension
             x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
-            x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+            train_feed_dict = { x_input: x_b, out_labels: y_b }
 
             # Execute training
-            train_feed_dict = { x_input: x_b, out_labels: y_b }
-            val_feed_dict = { x_input: x_vb, out_labels: y_vb }
-
             _, loss_value = sess.run([optimizer, kld_loss], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
             sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
             
             # Validation
-            if (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
+            if do_validation:
+                # Get next batch
+                x_vb_t, y_vb = val_gen.next()
+                # Reshape the x_b batch with channel as last dimension
+                x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                val_feed_dict = { x_input: x_vb, out_labels: y_vb }
+
+                # Execute training
                 val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
                 val_loss = sess.run(kld_loss, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
 
                 duration = time.time() - start_time
-                cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)
-                csv_writer.writerow([step, sess_acc, loss_value, val_acc, val_loss])
+                cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
+                csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
 
             # Write summary data for tensorboard
             if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
