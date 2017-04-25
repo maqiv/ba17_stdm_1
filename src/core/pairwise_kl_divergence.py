@@ -29,23 +29,23 @@ def loss_with_kl_div(P, xp, Q, xq, margin):
 
     KLPQ = tf.reduce_sum(tf.multiply(P, tf.log(tf.divide(P, Q))))
     KLQP = tf.reduce_sum(tf.multiply(Q, tf.log(tf.divide(Q, P))))
-    lossPQ = tf.multiply(Is, tf.add(KLPQ, tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLPQ)))))
-    lossQP = tf.multiply(Is, tf.add(KLQP, tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLQP)))))
+    lossPQ = tf.add(tf.multiply(Is, KLPQ), tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLPQ))))
+    lossQP = tf.add(tf.multiply(Is, KLQP), tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLQP))))
     L = tf.add(lossPQ, lossQP)
     return L
 
 def outerLoop(x, tf_l, predictions, labels, margin):
-    def innerLoop(y,x, tf_l, predictions, labels, margin):
+    def innerLoop(y, x, tf_l, predictions, labels, margin):
         #tf.cond(tf.locical_and(tf.equal(xq, xp), tf.less(y, x)),loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero)
-        tf_l = tf.add(tf_l, tf.cond(tf.greater(y,x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
+        tf_l = tf.add(tf_l, tf.cond(tf.greater(y, x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
         y = tf.add(y, tf.constant(1))
         return y, x, tf_l, predictions, labels, margin
 
-    def innerLoop_cond(y ,x, tf_l, predictions, labels, margin):
+    def innerLoop_cond(y, x, tf_l, predictions, labels, margin):
         return tf.less(y, tf.shape(predictions)[0])
     
     y = tf.constant(0)
-    res = tf.while_loop(innerLoop_cond, innerLoop, [y,x,tf_l, predictions, labels, margin], name='innerloop')
+    res = tf.while_loop(innerLoop_cond, innerLoop, [y, x, tf_l, predictions, labels, margin], name='innerloop')
     return tf.add(x, 1), res[2], predictions, labels, margin
 
 def outerLoop_condition(x, tf_l, predictions, labels, margin):
