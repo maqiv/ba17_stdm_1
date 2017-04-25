@@ -162,7 +162,7 @@ class cnn_rnn_tf_1(object):
 
         cnn_rnn_tf_1.logger.info("Start training")
         for step in range(cnn_rnn_tf_1.stngs['batch_loops']):
-            do_validation = (step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0)
+            do_validation = ((step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0)
 
             if do_validation:
                 start_time = time.time()
