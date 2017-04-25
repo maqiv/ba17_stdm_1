@@ -185,7 +185,7 @@ class cnn_rnn_tf_1(object):
             cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)
             csv_writer.writerow([step, sess_acc, loss_value, val_acc, val_loss])
 
-            if step % 100 == 0:
+            if (step + 1) % 100 == 0:
                 tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
                 tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
                 tb_train_writer.add_summary(tb_train_summary_str, step)
@@ -196,7 +196,7 @@ class cnn_rnn_tf_1(object):
                 tb_val_writer.add_summary(tb_val_summary_str, step)
                 tb_val_writer.flush()
 
-            if step % 500 == 0:
+            if (step + 1) % 500 == 0:
                 ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['ckpt_file_pfx'])
                 tb_saver.save(sess, ckpt_file, global_step=step)
 
