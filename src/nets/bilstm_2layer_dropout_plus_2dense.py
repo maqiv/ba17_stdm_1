@@ -51,7 +51,7 @@ class bilstm_2layer_dropout(object):
         model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden2)))
         model.add(Dense(self.n_classes*10))
-        model.add(Dropout(0.50))
+        #model.add(Dropout(0.50))
         model.add(Dense(self.n_classes*5))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
@@ -82,14 +82,14 @@ class bilstm_2layer_dropout(object):
         calls = self.create_callbacks()
         
         X_t, y_t, X_v, y_v = self.create_train_data()
-        train_gen = dg.batch_generator_lstm(X_t, y_t, 128, segment_size=self.segment_size)
-        val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
+        train_gen = dg.batch_generator_lstm(X_t, y_t, 100, segment_size=self.segment_size)
+        val_gen = dg.batch_generator_lstm(X_v, y_v, 100, segment_size=self.segment_size)
         batches_t = ((X_t.shape[0]+128 -1 )// 128) 
         batches_v = ((X_v.shape[0]+128 -1 )// 128)
         
         history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_epoch, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
-                    validation_steps=5, class_weight=None, max_q_size=10, 
+                    validation_steps=2, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
         ps.save_accuracy_plot(history, self.network_name)
         ps.save_loss_plot(history, self.network_name)

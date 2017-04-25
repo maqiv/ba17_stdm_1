@@ -5,7 +5,6 @@ import time
 import logging
 import datetime
 import numpy as np
-import tensorflow as tf
 
 import core.data_gen as dg
 import core.pairwise_kl_divergence_np as pkld
@@ -16,19 +15,23 @@ with open('/home/patman/pa/1_Code/data/training/TIMIT_extracted/speakers_100_50w
 X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.125, 8)
 
 def build_pairs(l):
+	
 	same = 0.
 	pairs = 0.
+	pair_list = []
 	print l
 	for i in range(len(l)):
-		for j in range(len(l)):
-			if (i < j):
+		j = i+1
+		for j in range(i+1,len(l)):
+				print j
 				pairs = pairs +1
 				if (l[i] == l[j]):
-					print l[i]
-					print l[j]
 					same = same+ 1
-	print "same pairs: ",same
-	print "pairs : ", pairs
+					pair_list.append((l[i], l[j], 1))
+				else:
+					pair_list.append((l[i], l[j], 0))
+	print pair_list
+	print np.vstack(pair_list).shape
 	return same/pairs				
 
 
@@ -44,4 +47,4 @@ for i in range(1):
 	print p
 	s += p
 
-print p/100
+print s/100

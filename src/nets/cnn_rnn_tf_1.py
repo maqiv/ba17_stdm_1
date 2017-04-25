@@ -177,7 +177,7 @@ class cnn_rnn_tf_0(object):
 
             _, loss_value = sess.run([optimizer, kld_loss], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
             sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
-
+            
             val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
             val_loss = sess.run(kld_loss, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
             

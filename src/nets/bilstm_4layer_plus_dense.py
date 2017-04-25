@@ -57,10 +57,11 @@ class bilstm_4layer(object):
         model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden4)))
         model.add(Dense(10*self.n_classes))
+        model.add(Dense(5*self.n_classes))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        model.compile(loss='kullback_leibler_divergence',
+        model.compile(loss='categorical_crossentropy',
                     optimizer=adam,
                     metrics=['accuracy'])
         return model
@@ -91,9 +92,9 @@ class bilstm_4layer(object):
         batches_t = ((X_t.shape[0]+128 -1 )// 128)
         batches_v = ((X_v.shape[0]+128 -1 )// 128)
         
-        history = model.fit_generator(train_gen, steps_per_epoch = batches_t, epochs = self.n_epoch, 
+        history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_epoch, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
-                    validation_steps=batches_v, class_weight=None, max_q_size=10, 
+                    validation_steps=2, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
         ps.save_accuracy_plot(history, self.network_name)
         ps.save_loss_plot(history, self.network_name)

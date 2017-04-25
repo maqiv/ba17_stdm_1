@@ -72,4 +72,5 @@ class continue_testing(object):
         model.save(settings.NET_PATH+self.network_name+".h5")
 
 if __name__ == "__main__":
-    continue_testing('kld_run20170421', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=500, segment_size=50)
+    #continue_testing('kld_run20170422', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=500, segment_size=50)
+    continue_testing('kld_run20170422_add_500_add_500_add_500_add_500_add_500', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=500, segment_size=50)
