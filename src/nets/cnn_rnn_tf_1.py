@@ -161,12 +161,8 @@ class cnn_rnn_tf_1(object):
         csv_writer = csv.writer(csv_file_handler)
 
         cnn_rnn_tf_1.logger.info("Start training")
+        start_time = time.time()
         for step in range(cnn_rnn_tf_1.stngs['batch_loops']):
-            do_validation = ((step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0)
-
-            if do_validation:
-                start_time = time.time()
-
             # Get next batch
             x_b_t, y_b = train_gen.next()
             # Reshape the x_b batch with channel as last dimension
@@ -178,7 +174,7 @@ class cnn_rnn_tf_1(object):
             sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
             
             # Validation
-            if do_validation:
+            if (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
                 # Get next batch
                 x_vb_t, y_vb = val_gen.next()
                 # Reshape the x_b batch with channel as last dimension
@@ -192,6 +188,7 @@ class cnn_rnn_tf_1(object):
                 duration = time.time() - start_time
                 cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
                 csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
+                start_time = time.time()
 
             # Write summary data for tensorboard
             if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
