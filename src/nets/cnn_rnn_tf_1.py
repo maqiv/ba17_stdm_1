@@ -174,7 +174,7 @@ class cnn_rnn_tf_1(object):
             sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
             
             # Validation
-            if (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
+            if step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
                 # Get next batch
                 x_vb_t, y_vb = val_gen.next()
                 # Reshape the x_b batch with channel as last dimension
