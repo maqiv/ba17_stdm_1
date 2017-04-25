@@ -9,9 +9,9 @@
 #import nets.bilstm_2layer_dropout_plus_2dense as lstm2_dense
 #import nets.bilstm_4layer_plus_dense as lstm4_dense
 #import nets.bilstm_2layer_dropout_kld as bi2dkld
-import nets.cnn_rnn_tf_0 as crt0
+#import nets.cnn_rnn_tf_0 as crt0
 import nets.cnn_rnn_tf_1 as crt1
-import nets.bilstm_tf_1	as bt1
+#import nets.bilstm_tf_1 as bt1
 
 
 
@@ -36,5 +36,5 @@ import nets.bilstm_tf_1	as bt1
 #network = test.test('test01', 'test_data_10_not_clustering_vs_reynolds.pickle', n_classes=10, n_epoch=4)
 #network.run_network()
 
-crt1.cnn_rnn_tf_0('nets/crt_settings.json')
+crt1.cnn_rnn_tf_1('nets/crt_settings.json')
 
