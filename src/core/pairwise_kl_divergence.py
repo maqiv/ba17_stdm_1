@@ -7,63 +7,72 @@ from tensorflow.python import debug as tf_debug
 
 
 
-tf_l = tf.Variable(0. , name='loss')
-x = tf.constant(0.)
-margin = tf.constant(2.)
-loss = tf.Variable(0.)
-sum_loss = tf.Variable(0.)
+with tf.device('/gpu:0'):
+    tf_l = tf.Variable(0. , name='loss')
+    x = tf.constant(0.)
+    margin = tf.constant(2.)
+    loss = tf.Variable(0.)
+    sum_loss = tf.Variable(0.)
 
 def return_zero():
-    return tf.add(tf.constant(0.), tf.constant(1e-16))
+    with tf.device('/gpu:0'):
+        return tf.add(tf.constant(0.), tf.constant(1e-16))
 
 def return_one():
-    return tf.add(tf.constant(1.), tf.constant(1e-16))
+    with tf.device('/gpu:0'):
+        return tf.add(tf.constant(1.), tf.constant(1e-16))
 
 def loss_with_kl_div(P, xp, Q, xq, margin):
-    epsilon = tf.constant(1e-16)
-    P = tf.add(epsilon, P)
-    Q = tf.add(epsilon, Q)
+    with tf.device('/gpu:0'):
+        epsilon = tf.constant(1e-16)
+        P = tf.add(epsilon, P)
+        Q = tf.add(epsilon, Q)
 
-    Is = tf.cond(tf.reduce_all(tf.equal(xq, xp)), return_one, return_zero)
-    Ids = tf.abs(tf.subtract(Is, tf.constant(1.)))
+        Is = tf.cond(tf.reduce_all(tf.equal(xq, xp)), return_one, return_zero)
+        Ids = tf.abs(tf.subtract(Is, tf.constant(1.)))
 
-    KLPQ = tf.reduce_sum(tf.multiply(P, tf.log(tf.divide(P, Q))))
-    KLQP = tf.reduce_sum(tf.multiply(Q, tf.log(tf.divide(Q, P))))
-    lossPQ = tf.multiply(Is, tf.add(KLPQ, tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLPQ)))))
-    lossQP = tf.multiply(Is, tf.add(KLQP, tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLQP)))))
-    L = tf.add(lossPQ, lossQP)
-    return L
+        KLPQ = tf.reduce_sum(tf.multiply(P, tf.log(tf.divide(P, Q))))
+        KLQP = tf.reduce_sum(tf.multiply(Q, tf.log(tf.divide(Q, P))))
+        lossPQ = tf.multiply(Is, tf.add(KLPQ, tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLPQ)))))
+        lossQP = tf.multiply(Is, tf.add(KLQP, tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLQP)))))
+        L = tf.add(lossPQ, lossQP)
+        return L
 
 def outerLoop(x, tf_l, predictions, labels, margin):
-    def innerLoop(y,x, tf_l, predictions, labels, margin):
-        #tf.cond(tf.locical_and(tf.equal(xq, xp), tf.less(y, x)),loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero)
-        tf_l = tf.add(tf_l, tf.cond(tf.greater(y,x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
-        y = tf.add(y, tf.constant(1))
-        return y, x, tf_l, predictions, labels, margin
+    with tf.device('/gpu:0'):
+        def innerLoop(y,x, tf_l, predictions, labels, margin):
+            with tf.device('/gpu:0'):
+                #tf.cond(tf.locical_and(tf.equal(xq, xp), tf.less(y, x)),loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero)
+                tf_l = tf.add(tf_l, tf.cond(tf.greater(y,x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
+                y = tf.add(y, tf.constant(1))
+                return y, x, tf_l, predictions, labels, margin
 
-    def innerLoop_cond(y ,x, tf_l, predictions, labels, margin):
-        return tf.less(y, tf.shape(predictions)[0])
-    
-    y = tf.constant(0)
-    res = tf.while_loop(innerLoop_cond, innerLoop, [y,x,tf_l, predictions, labels, margin], name='innerloop')
-    return tf.add(x, 1), res[2], predictions, labels, margin
+        def innerLoop_cond(y ,x, tf_l, predictions, labels, margin):
+            with tf.device('/gpu:0'):
+                return tf.less(y, tf.shape(predictions)[0])
+        
+        y = tf.constant(0)
+        res = tf.while_loop(innerLoop_cond, innerLoop, [y,x,tf_l, predictions, labels, margin], name='innerloop')
+        return tf.add(x, 1), res[2], predictions, labels, margin
 
 def outerLoop_condition(x, tf_l, predictions, labels, margin):
-    return tf.less(x, tf.shape(predictions)[0])
+    with tf.device('/gpu:0'):
+        return tf.less(x, tf.shape(predictions)[0])
 
 def pairwise_kl_divergence(labels, predictions):
-    x = tf.constant(0)
-    #margin = tf.constant(2.)
-    #loss = tf.Variable(0.)
-    #tf_l = tf.Variable(0. , name='loss')
-    sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], name='outerloop')
-    n = tf.to_float(tf.shape(predictions)[0])
-    print n
-    pairs = tf.multiply(n, tf.divide(tf.subtract(n, tf.constant(1.)), tf.constant(2.)))
-    print pairs
-    loss = tf.divide(sum_loss[1], pairs)
-    print loss
-    return loss
+    with tf.device('/gpu:0'):
+        x = tf.constant(0)
+        #margin = tf.constant(2.)
+        #loss = tf.Variable(0.)
+        #tf_l = tf.Variable(0. , name='loss')
+        sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], name='outerloop')
+        n = tf.to_float(tf.shape(predictions)[0])
+        print n
+        pairs = tf.multiply(n, tf.divide(tf.subtract(n, tf.constant(1.)), tf.constant(2.)))
+        print pairs
+        loss = tf.divide(sum_loss[1], pairs)
+        print loss
+        return loss
     
 if __name__ == "__main__":
     with open('/home/patman/pa/1_Code/data/experiments/cluster_outputs/test_for_kld.pickle', 'rb') as f:
