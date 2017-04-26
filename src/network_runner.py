@@ -28,7 +28,7 @@ import nets.cnn_rnn_tf_1 as crt1
 #bi2d.bilstm_2layer_dropout('cluster_train_droput_500ms_128_400sp', 'train_clustering_400.pickle', n_hidden1=128, n_hidden2=128, n_classes=400, n_epoch=4000, segment_size=50)
 #bi2d.bilstm_2layer_dropout('kld_clust_lstm2', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=1, segment_size=50)
 #lstm4_dense.bilstm_4layer('20170425_lstm4_dense_cross_entropy', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_hidden3 = 256, n_hidden4=256, n_classes=100, n_epoch=1000, segment_size=50)
-lstm2_dense.bilstm_2layer_dropout('20170425_lstm2_dense_kld_100batch', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=1000, segment_size=50)
+#lstm2_dense.bilstm_2layer_dropout('20170426_lstm2_dense_kld_100batch_new_labels', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=1000, segment_size=50)
 #bi4.bilstm_4layer('20170425_lstm4__cross_entropy', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_hidden3 = 256, n_hidden4=256, n_classes=100, n_epoch=1000, segment_size=50)
 #lstm4_dense.bilstm_4layer('20170425_lstm4_dense_cross_entropy', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_hidden3 = 256, n_hidden4=256, n_classes=100, n_epoch=1000, segment_size=50)
 

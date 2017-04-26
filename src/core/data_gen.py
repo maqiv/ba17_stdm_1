@@ -72,6 +72,25 @@ def batch_generator(X, y, batch_size=128, segment_size=100):
                 Xb[j, 0] = spect[:, seg_idx:seg_idx + segment_size]
             yield Xb, transformy(yb, bs, speakers)
 
+def batch_generator_v2(X, y, batch_size=128, segment_size=100):
+    segments = X.shape[0]
+    bs = batch_size
+    speakers = np.amax(y)+1
+        # build as much batches as fit into the training set
+    while 1:   
+        for i in range((segments + bs - 1) // bs):
+            Xb = np.zeros((bs, 1, settings.FREQ_ELEMENTS, segment_size), dtype=np.float32)
+            yb = np.zeros(bs, dtype=np.int32)
+                # here one batch is generated
+            for j in range(0, bs):
+                speaker_idx = randint(0, len(X) - 1)
+                if y is not None:
+                    yb[j] = y[speaker_idx]
+                spect = extract_spectrogram(X[speaker_idx, 0], segment_size)
+                seg_idx = randint(0, spect.shape[1] - segment_size)
+                Xb[j, 0] = spect[:, seg_idx:seg_idx + segment_size]
+            yield Xb, create_pairs(yb)
+
 #Batch generator von LSTMS
 def batch_generator_lstm(X, y, batch_size, segment_size=15):
     segments = X.shape[0]
@@ -109,9 +128,9 @@ def batch_generator_lstm_v2(X, y, batch_size, segment_size=15):
                 spect = extract_spectrogram(X[speaker_idx, 0], segment_size)
                 seg_idx = randint(0, spect.shape[1] - segment_size)
                 Xb[j, 0] = spect[:, seg_idx:seg_idx + segment_size]
-            yield Xb.reshape(bs,segment_size,settings.FREQ_ELEMENTS), yb
+            yield Xb.reshape(bs,segment_size,settings.FREQ_ELEMENTS), create_pairs(yb)
 
-def  transformy(y, batch_size, nb_classes):
+def transformy(y, batch_size, nb_classes):
     yn = np.zeros((batch_size, nb_classes))
     k = 0
     for v in y:
@@ -119,6 +138,18 @@ def  transformy(y, batch_size, nb_classes):
         yn[k][v] =1
         k +=1
     return yn
+
+def create_pairs(l):
+    pair_list = []
+    for i in range(len(l)):
+        j = i+1
+        for j in range(i+1,len(l)):
+                print j
+                if (l[i] == l[j]):
+                    pair_list.append((int(i) , int(j), 1))
+                else:
+                    pair_list.append((int(i) , int(j), 0))
+    return np.vstack(pair_list)
 
 
 # splits the train data in the specified split. to get 6 training sentences and 2 validation use:

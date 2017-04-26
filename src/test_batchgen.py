@@ -15,7 +15,6 @@ with open('/home/patman/pa/1_Code/data/training/TIMIT_extracted/speakers_100_50w
 X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.125, 8)
 
 def build_pairs(l):
-	
 	same = 0.
 	pairs = 0.
 	pair_list = []
@@ -27,9 +26,9 @@ def build_pairs(l):
 				pairs = pairs +1
 				if (l[i] == l[j]):
 					same = same+ 1
-					pair_list.append((l[i], l[j], 1))
+					pair_list.append((l[i], l[j], i , j, 1))
 				else:
-					pair_list.append((l[i], l[j], 0))
+					pair_list.append((l[i], l[j], i , j, 0))
 	print pair_list
 	print np.vstack(pair_list).shape
 	return same/pairs				

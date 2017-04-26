@@ -57,7 +57,7 @@ def generate_cluster_output(network_name, test_data, output_file, one_file, writ
     im_model = Model(input = model.input, output = model.layers[2].output)
     data_out = im_model.predict(X_test)
     da = np.asarray(data_out)
-    da = da[:, -1, :]
+    #da = da[:, -1, :]
     #print "shape: " , da[:][-1][:].shape
     with open(settings.CLUSTER_OUTPUT_PATH+output_file, 'wb') as f:
         pickle.dump((da, y_test, s_list), f, -1)
@@ -78,12 +78,12 @@ if __name__ == "__main__":
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_20.pickle', 'train_cluster_out_20sp_500ms_256_400sp_kld', True, True, True)
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'test_test_clustering_60.pickle', 'test_cluster_out_60sp_500ms_256_400sp_kld', True, True, True)
     #generate_cluster_output('cluster_train_droput_500ms_256_100sp_kld', 'train_test_clustering_60.pickle', 'train_cluster_out_60sp_500ms_256_400sp_kld', True, True, True)
-    generate_cluster_output('20170425_lstm4__cross_entropy', 'train_speakers_40_clustering_vs_reynolds.pickle', '20170425_lstm4__cross_entropy_train_cluster_40_lstm2.pickel', True, True, True)
-    generate_cluster_output('20170425_lstm4__cross_entropy', 'test_speakers_40_clustering_vs_reynolds.pickle', '20170425_lstm4__cross_entropy_test_cluster_40_lstm2.pickel', True, True, True)    
-    #generate_cluster_output('20170425_lstm4__cross_entropy', 'train_speakers_60_clustering.pickle', '20170425_lstm4__cross_entropy_train_cluster_60.pickel', True, True, True)
-    #generate_cluster_output('20170425_lstm4__cross_entropy', 'test_speakers_60_clustering.pickle', '20170425_lstm4__cross_entropy_test_cluster_60.pickel', True, True, True)
-    #generate_cluster_output('20170425_lstm4__cross_entropy', 'train_speakers_80_clustering.pickle', '20170425_lstm4__cross_entropy_train_cluster_80.pickel', True, True, True)
-    #generate_cluster_output('20170425_lstm4__cross_entropy', 'test_speakers_80_clustering.pickle', '20170425_lstm4__cross_entropy_test_cluster_80.pickel', True, True, True)
+    generate_cluster_output('20170425_lstm2_dense_kld_100batch', 'train_speakers_40_clustering_vs_reynolds.pickle', '20170425_lstm2_dense_kld_100batch_train_cluster_40.pickel', True, True, True)
+    generate_cluster_output('20170425_lstm2_dense_kld_100batch', 'test_speakers_40_clustering_vs_reynolds.pickle', '20170425_lstm2_dense_kld_100batch_test_cluster_40.pickel', True, True, True)    
+    generate_cluster_output('20170425_lstm2_dense_kld_100batch', 'train_speakers_60_clustering.pickle', '20170425_lstm2_dense_kld_100batch_train_cluster_60.pickel', True, True, True)
+    generate_cluster_output('20170425_lstm2_dense_kld_100batch', 'test_speakers_60_clustering.pickle', '20170425_lstm2_dense_kld_100batch_test_cluster_60.pickel', True, True, True)
+    generate_cluster_output('20170425_lstm2_dense_kld_100batch', 'train_speakers_80_clustering.pickle', '20170425_lstm2_dense_kld_100batch_train_cluster_80.pickel', True, True, True)
+    generate_cluster_output('20170425_lstm2_dense_kld_100batch', 'test_speakers_80_clustering.pickle', '20170425_lstm2_dense_kld_100batch_test_cluster_80.pickel', True, True, True)
     #generate_cluster_output('kldold_clust_lstm4', 'train_speakers_40_clustering_vs_reynolds.pickle', 'train_cluster_40_lstm4_layer_lstm4_out.pickel', True, True, True)
     #generate_cluster_output('kldold_clust_lstm4', 'test_speakers_40_clustering_vs_reynolds.pickle', 'test_cluster_40_lstm4_layer_lstm4_out.pickel', True, True, True)
     #generate_cluster_output('kldold_clust_lstm4_dense', 'train_speakers_40_clustering_vs_reynolds.pickle', 'train_cluster_40_lstm4d_layer_lstm4_out.pickel', True, True, True)

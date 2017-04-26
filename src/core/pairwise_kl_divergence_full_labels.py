@@ -21,50 +21,38 @@ def return_one():
     #return tf.add(tf.constant(1.), tf.constant(1e-16))
     return tf.constant(1.)
 
-def loss_with_kl_div(P, xp, Q, xq, margin):
+def loss_with_kl_div(P, Q, same , margin):
     epsilon = tf.constant(1e-16)
     P = tf.add(epsilon, P)
     Q = tf.add(epsilon, Q)
-
-    Is = tf.cond(tf.reduce_all(tf.equal(xq, xp)), return_one, return_zero)
-    Ids = tf.abs(tf.subtract(Is, tf.constant(1.)))
+    same = tf.to_float(same)
+    Ids = tf.abs(tf.subtract(tf.to_float(same), tf.constant(1.)))
 
     KLPQ = tf.reduce_sum(tf.multiply(P, tf.log(tf.divide(P, Q))))
     KLQP = tf.reduce_sum(tf.multiply(Q, tf.log(tf.divide(Q, P))))
-    lossPQ = tf.add(tf.multiply(Is, KLPQ), tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLPQ))))
-    lossQP = tf.add(tf.multiply(Is, KLQP), tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLQP))))
+    lossPQ = tf.add(tf.multiply(same, KLPQ), tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLPQ))))
+    lossQP = tf.add(tf.multiply(same, KLQP), tf.multiply(Ids, tf.maximum(tf.constant(0.), tf.subtract(margin, KLQP))))
     L = tf.add(lossPQ, lossQP)
     return L
 
 def outerLoop(x, tf_l, predictions, labels, margin):
-    def innerLoop(y, x, tf_l, predictions, labels, margin):
-        #tf.cond(tf.locical_and(tf.equal(xq, xp), tf.less(y, x)),loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero)
-        tf_l = tf.add(tf_l, tf.cond(tf.greater(y, x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
-        y = tf.add(y, tf.constant(1))
-        return y, x, tf_l, predictions, labels, margin
-
-    def innerLoop_cond(y, x, tf_l, predictions, labels, margin):
-        return tf.less(y, tf.shape(predictions)[0])
     
-    y = tf.constant(0)
-    res = tf.while_loop(innerLoop_cond, innerLoop, [y, x, tf_l, predictions, labels, margin], name='innerloop')
-    return tf.add(x, 1), res[2], predictions, labels, margin
+    tf_l = tf.add(tf_l, loss_with_kl_div(predictions[labels[x][0]], predictions[labels[x][1]], labels[x][2], margin))
+    return tf.add(x, 1), tf_l, predictions, labels, margin
 
 def outerLoop_condition(x, tf_l, predictions, labels, margin):
-    return tf.less(x, tf.shape(predictions)[0])
+
+    return tf.less(x, tf.shape(labels)[0])
 
 def pairwise_kl_divergence(labels, predictions):
     x = tf.constant(0)
-    #margin = tf.constant(2.)
+    margin = tf.constant(2.)
     #loss = tf.Variable(0.)
     #tf_l = tf.Variable(0. , name='loss')
-    sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], name='outerloop')
-    n = tf.to_float(tf.shape(predictions)[0])
-    print n
-    pairs = tf.multiply(n, tf.divide(tf.subtract(n, tf.constant(1.)), tf.constant(2.)))
-    print pairs
-    loss = tf.divide(sum_loss[1], pairs)
-    print loss
+    sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, tf.to_int32(labels), margin], name='outerloop')
+    
+    pairs = tf.shape(labels)[0]
+    loss = tf.divide(sum_loss[1], tf.to_float(pairs))
     return loss
     
 if __name__ == "__main__":
@@ -77,10 +65,27 @@ if __name__ == "__main__":
     test_targ = [[1., 0., 0.], [1., 0., 0.], [0., 0., 1.], [0., 1., 0.], [0., 1. , 0.]]
     test_margin = 2.
     predictions = tf.placeholder('float', [None, None])
-    targets = tf.placeholder('float', [None, None])
+    targets = tf.placeholder('int32', [None, None])
     margin = tf.placeholder('float', None)
     print y.shape
-    print X.shape
+    print y.shape
+    yl = []
+    for l in y:
+        for i in range(len(l)):
+                if l[i] == 1. :
+                    yl.append(i)
+
+    print yl
+    pair_list = []
+    for i in range(len(yl)):
+        j = i+1
+        for j in range(i+1,len(yl)):
+                if (yl[i] == yl[j]):
+                    pair_list.append((i , j, 1))
+                else:
+                    pair_list.append((i , j, 0))
+    y = np.vstack(pair_list)
+    print y
     margin = tf.stack(test_margin)
     result = pairwise_kl_divergence(targets, predictions)
     sess = tf.Session()
