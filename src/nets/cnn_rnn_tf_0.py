@@ -162,6 +162,11 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger.info("")
         cnn_rnn_tf_0.logger.info("GRU:")
         cnn_rnn_tf_0.logger.info("  Neurons: %d", cnn_rnn_tf_0.stngs['gru']['neurons_number'])
+        cnn_rnn_tf_0.logger.info("")
+        cnn_rnn_tf_0.logger.info("MaxPooling 1:")
+        cnn_rnn_tf_0.logger.info("  Shape: %s", pool1.shape)
+        cnn_rnn_tf_0.logger.info("MaxPooling 2:")
+        cnn_rnn_tf_0.logger.info("  Shape: %s", pool2.shape)
         cnn_rnn_tf_0.logger.info("-----------------------")
 
         # Create training batches

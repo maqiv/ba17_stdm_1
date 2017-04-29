@@ -71,3 +71,14 @@ crt0.cnn_rnn_tf_0('nets/crt_settings.json',
                     n_pool2=[3, 3],
                     n_strides2=[3, 1],
                 )
+
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[7, 7],
+                    n_pool1=[3, 3],
+                    n_strides1=[2, 2],
+                    n_filter2=64,
+                    n_kernel2=[5, 5],
+                    n_pool2=[3, 3],
+                    n_strides2=[2, 2],
+                )
