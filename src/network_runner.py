@@ -4,13 +4,13 @@
 #import nets.bilstm_4layer_plus_dense as lstm4_dense
 #import nets.bilstm_4layer as bi4
 #import nets.bilstm_3layer as bi3
-import nets.bilstm_4layer as bi4
+#import nets.bilstm_4layer as bi4
 #import nets.cnn_lstm_layer7 as cnn_lstm
-import nets.bilstm_2layer_dropout_plus_2dense as lstm2_dense
-import nets.bilstm_4layer_plus_dense as lstm4_dense
+#import nets.bilstm_2layer_dropout_plus_2dense as lstm2_dense
+#import nets.bilstm_4layer_plus_dense as lstm4_dense
 #import nets.bilstm_2layer_dropout_kld as bi2dkld
-#import nets.cnn_rnn_tf_0 as crt0
-import nets.cnn_rnn_tf_1 as crt1
+import nets.cnn_rnn_tf_0 as crt0
+#import nets.cnn_rnn_tf_1 as crt1
 #import nets.bilstm_tf_1 as bt1
 
 
@@ -39,6 +39,13 @@ import nets.cnn_rnn_tf_1 as crt1
 
 #crt1.cnn_rnn_tf_0('nets/crt_settings.json')
 
-crt1.cnn_rnn_tf_1('nets/crt_settings.json')
-
-
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[8, 1],
+                    n_pool1=[4, 4],
+                    n_strides1=[2, 2],
+                    n_filter2=32,
+                    n_kernel2=[8, 1],
+                    n_pool2=[4, 4],
+                    n_strides2=[2, 2],
+                )

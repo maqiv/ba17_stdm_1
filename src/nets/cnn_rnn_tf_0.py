@@ -11,22 +11,42 @@ import core.data_gen as dg
 import cPickle as pickle
 
 class cnn_rnn_tf_0(object):
-    
+
     stngs = None
     logger = None
     date_time = None
-    
-    def __init__(self, network_settings_file):
+
+    def __init__(self,
+            network_settings_file,
+            n_filter1=32,
+            n_kernel1=[8, 1],
+            n_pool1=[4, 4],
+            n_strides1=[2, 2],
+            n_filter2=64,
+            n_kernel2=[8, 1],
+            n_pool2=[4, 4],
+            n_strides2=[2, 2]
+            ):
+
         cnn_rnn_tf_0.stngs = self.load_settings(network_settings_file)
+        self.n_filter1 = n_filter1
+        self.n_kernel1 = n_kernel1
+        self.n_pool1 = n_pool1
+        self.n_strides1 = n_strides1
+        self.n_filter2 = n_filter2
+        self.n_kernel2 = n_kernel2
+        self.n_pool2 = n_pool2
+        self.n_strides2 = n_strides2
+
         self.initialize_logger()
         cnn_rnn_tf_0.logger.info("Calling run_network()")
         self.run_network()
-    
+
     def initialize_logger(self):
         today_now = datetime.datetime.now()
         self.date_time = '_{:04d}-{:02d}-{:02d}_{:02d}-{:02d}-{:02d}'.format(
-                            today_now.year, today_now.month, today_now.day,
-                            today_now.hour, today_now.minute, today_now.second)
+                today_now.year, today_now.month, today_now.day,
+                today_now.hour, today_now.minute, today_now.second)
 
         # Python logger
         cnn_rnn_tf_0.logger = logging.getLogger(__name__)
@@ -42,13 +62,13 @@ class cnn_rnn_tf_0(object):
 
         cnn_rnn_tf_0.logger.addHandler(log_file_handler)
 
-        
+
     def load_settings(self, settings_file):
         with open(settings_file) as json_settings_file:
             json_settings = json.load(json_settings_file)
         return json_settings
-        
-        
+
+
     def tf_log_dir(self):
         current_workdir = os.getcwd()
         tstamp = int(time.time())
@@ -60,12 +80,12 @@ class cnn_rnn_tf_0(object):
     # Parse training data to matrices
     def create_train_data(self):
         with open(os.path.join(cnn_rnn_tf_0.stngs['cnn']['train_data_path'], cnn_rnn_tf_0.stngs['cnn']['train_data_file']), 'rb') as f:
-          (X, y, speaker_names) = pickle.load(f)
+            (X, y, speaker_names) = pickle.load(f)
 
         X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.125, 8)
         return X_t, y_t, X_v, y_v
 
-    
+
     # Create basic net infrastructure
     def create_net(self):
         cnn_rnn_tf_0.logger.info("Creating placeholders")
@@ -75,19 +95,19 @@ class cnn_rnn_tf_0(object):
 
         cnn_rnn_tf_0.logger.info("Creating first convolution layer")
         with tf.name_scope('Convolution_1'):
-            conv1 = tf.layers.conv2d(inputs=x_input, filters=32, kernel_size=[8, 1], padding="same", activation=tf.nn.relu)
+            conv1 = tf.layers.conv2d(inputs=x_input, filters=self.n_filter1, kernel_size=self.n_kernel1, padding="same", activation=tf.nn.relu)
 
         cnn_rnn_tf_0.logger.info("Creating first maxpooling layer")
         with tf.name_scope('MaxPooling_1'):
-            pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[4, 4], strides=[2, 2])
+            pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=self.n_pool1, strides=self.n_strides1)
 
         cnn_rnn_tf_0.logger.info("Creating second convolution layer")
         with tf.name_scope('Convolution_2'):
-            conv2 = tf.layers.conv2d(inputs=pool1, filters=64, kernel_size=[8, 1], padding="same", activation=tf.nn.relu)
+            conv2 = tf.layers.conv2d(inputs=pool1, filters=self.n_filter2, kernel_size=self.n_kernel2, padding="same", activation=tf.nn.relu)
 
         cnn_rnn_tf_0.logger.info("Creating second maxpooling layer")
         with tf.name_scope('MaxPooling_2'):
-            pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[4, 4], strides=[2, 2])
+            pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=self.n_pool2, strides=self.n_strides2)
 
         cnn_rnn_tf_0.logger.info("Creating reshape layer between cnn and gru")
         with tf.name_scope('Reshape'):
@@ -120,11 +140,30 @@ class cnn_rnn_tf_0(object):
             correct_pred = tf.equal(tf.argmax(gru_soft_out, 1), tf.argmax(out_labels, 1))
             accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
             tf.summary.scalar('accuracy', accuracy)
-        
+
         return optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels
 
-    
+
     def run_network(self):
+        # Write network details
+        cnn_rnn_tf_0.logger.info("-----------------------")
+        cnn_rnn_tf_0.logger.info("Network configuration:")
+        cnn_rnn_tf_0.logger.info("CNN 1:")
+        cnn_rnn_tf_0.logger.info("  Filter count: %d", self.n_filter1)
+        cnn_rnn_tf_0.logger.info("  Kernel size: %s", self.n_kernel1)
+        cnn_rnn_tf_0.logger.info("  Pool size: %s", self.n_pool1)
+        cnn_rnn_tf_0.logger.info("  Stride size: %s", self.n_strides1)
+        cnn_rnn_tf_0.logger.info("")
+        cnn_rnn_tf_0.logger.info("CNN 2:")
+        cnn_rnn_tf_0.logger.info("  Filter count: %d", self.n_filter2)
+        cnn_rnn_tf_0.logger.info("  Kernel size: %s", self.n_kernel2)
+        cnn_rnn_tf_0.logger.info("  Pool size: %s", self.n_pool2)
+        cnn_rnn_tf_0.logger.info("  Stride size: %s", self.n_strides2)
+        cnn_rnn_tf_0.logger.info("")
+        cnn_rnn_tf_0.logger.info("GRU:")
+        cnn_rnn_tf_0.logger.info("  Neurons: %d", cnn_rnn_tf_0.stngs['gru']['neurons_number'])
+        cnn_rnn_tf_0.logger.info("-----------------------")
+
         # Create training batches
         cnn_rnn_tf_0.logger.info("Creating training batches")
         X_t, y_t, X_v, y_v = self.create_train_data()
@@ -133,7 +172,7 @@ class cnn_rnn_tf_0(object):
         # Create network model and tensors
         cnn_rnn_tf_0.logger.info("Initialize network model")
         optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels = self.create_net()
-        
+
         # CNN Training
         cnn_rnn_tf_0.logger.info("Initialize tensorflow session")
         sess = tf.Session()
@@ -179,7 +218,7 @@ class cnn_rnn_tf_0(object):
 
             val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
             val_loss = sess.run(cross_entropy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
-            
+
             duration = time.time() - start_time
             cnn_rnn_tf_0.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', step, duration, sess_acc, loss_value, val_acc, val_loss)
             csv_writer.writerow([step, sess_acc, loss_value, val_acc, val_loss])
@@ -213,7 +252,7 @@ class cnn_rnn_tf_0(object):
             train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
         train_net_output = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
-        
+
         cnn_rnn_tf_0.logger.info("Loading test data for GRU evaluation")
         with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['test_data_file']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
@@ -226,6 +265,6 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger.info("Write outcome to pickle files for clustering")
         with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_train_file'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output, train_y_data, train_speaker_names), f, -1)
-        
+
         with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_test_file'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output, test_y_data, test_speaker_names), f, -1)
