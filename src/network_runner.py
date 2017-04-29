@@ -41,11 +41,33 @@ import nets.cnn_rnn_tf_0 as crt0
 
 crt0.cnn_rnn_tf_0('nets/crt_settings.json',
                     n_filter1=32,
-                    n_kernel1=[8, 1],
+                    n_kernel1=[8, 8],
                     n_pool1=[4, 4],
                     n_strides1=[2, 2],
-                    n_filter2=32,
-                    n_kernel2=[8, 1],
+                    n_filter2=64,
+                    n_kernel2=[8, 8],
                     n_pool2=[4, 4],
                     n_strides2=[2, 2],
+                )
+
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[8, 1],
+                    n_pool1=[4, 1],
+                    n_strides1=[2, 1],
+                    n_filter2=64,
+                    n_kernel2=[8, 1],
+                    n_pool2=[4, 1],
+                    n_strides2=[2, 1],
+                )
+
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[4, 1],
+                    n_pool1=[2, 2],
+                    n_strides1=[2, 1],
+                    n_filter2=32,
+                    n_kernel2=[6, 1],
+                    n_pool2=[3, 3],
+                    n_strides2=[3, 1],
                 )
