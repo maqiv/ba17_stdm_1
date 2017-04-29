@@ -141,10 +141,6 @@ class cnn_rnn_tf_0(object):
             accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
             tf.summary.scalar('accuracy', accuracy)
 
-        return optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels
-
-
-    def run_network(self):
         # Write network details
         cnn_rnn_tf_0.logger.info("-----------------------")
         cnn_rnn_tf_0.logger.info("Network configuration:")
@@ -169,6 +165,10 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger.info("  Shape: %s", pool2.shape)
         cnn_rnn_tf_0.logger.info("-----------------------")
 
+        return optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels
+
+
+    def run_network(self):
         # Create training batches
         cnn_rnn_tf_0.logger.info("Creating training batches")
         X_t, y_t, X_v, y_v = self.create_train_data()
