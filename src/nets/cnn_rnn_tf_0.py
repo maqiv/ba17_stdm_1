@@ -273,3 +273,6 @@ class cnn_rnn_tf_0(object):
 
         with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_test_file'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output, test_y_data, test_speaker_names), f, -1)
+
+        # Close the Tensorflow session
+        sess.close()
