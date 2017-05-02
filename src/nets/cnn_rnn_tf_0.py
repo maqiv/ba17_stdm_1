@@ -169,6 +169,9 @@ class cnn_rnn_tf_0(object):
 
 
     def run_network(self):
+        # Reset the graph to free up resources
+        tf.reset_default_graph()
+
         # Create training batches
         cnn_rnn_tf_0.logger.info("Creating training batches")
         X_t, y_t, X_v, y_v = self.create_train_data()
