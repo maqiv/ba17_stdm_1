@@ -10,9 +10,9 @@
 #import nets.bilstm_4layer_plus_dense as lstm4_dense
 #import nets.bilstm_2layer_dropout_kld as bi2dkld
 #import nets.cnn_rnn_tf_0 as crt0
-#import nets.cnn_rnn_tf_1 as crt1
+import nets.cnn_rnn_tf_1 as crt1
 #import nets.bilstm_tf_1 as bt1
-import nets.cnn_rnn_tf_2 as crt2
+#import nets.cnn_rnn_tf_2 as crt2
 
 
 
@@ -38,7 +38,7 @@ import nets.cnn_rnn_tf_2 as crt2
 #network = test.test('test01', 'test_data_10_not_clustering_vs_reynolds.pickle', n_classes=10, n_epoch=4)
 #network.run_network()
 
-#crt1.cnn_rnn_tf_0('nets/crt_settings.json')
+crt1.cnn_rnn_tf_1('nets/crt_settings.json')
 
 #crt0.cnn_rnn_tf_0('nets/crt_settings.json',
 #                    n_filter1=32,
@@ -84,25 +84,25 @@ import nets.cnn_rnn_tf_2 as crt2
 #                    n_strides2=[2, 2],
 #                )
 
-crt2.cnn_rnn_tf_2('nets/crt_settings.json',
-                    n_filter1=16,
-                    n_kernel1=[7, 7],
-                    n_pool1=[3, 3],
-                    n_strides1=[2, 1],
-                    n_filter2=32,
-                    n_kernel2=[5, 5],
-                    n_pool2=[3, 3],
-                    n_strides2=[2, 1],
-                    n_filter3=32,
-                    n_kernel3=[3, 3],
-                    n_pool3=[3, 3],
-                    n_strides3=[2, 1],
-                    n_filter4=32,
-                    n_kernel4=[3, 3],
-                    n_pool4=[3, 3],
-                    n_strides4=[2, 1],
-                    n_gru_neurons=32
-                )
+#crt2.cnn_rnn_tf_2('nets/crt_settings.json',
+#                    n_filter1=16,
+#                    n_kernel1=[7, 7],
+#                    n_pool1=[3, 3],
+#                    n_strides1=[2, 1],
+#                    n_filter2=32,
+#                    n_kernel2=[5, 5],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_filter3=32,
+#                    n_kernel3=[3, 3],
+#                    n_pool3=[3, 3],
+#                    n_strides3=[2, 1],
+#                    n_filter4=32,
+#                    n_kernel4=[3, 3],
+#                    n_pool4=[3, 3],
+#                    n_strides4=[2, 1],
+#                    n_gru_neurons=32
+#                )
 
 #crt2.cnn_rnn_tf_2('nets/crt_settings.json',
 #                    n_filter1=64,

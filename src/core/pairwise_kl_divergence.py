@@ -44,14 +44,14 @@ def outerLoop(x, tf_l, predictions, labels, margin):
         return y, x, tf_l, predictions, labels, margin
 
     def innerLoop_cond(y, x, tf_l, predictions, labels, margin):
-        return tf.less(y, tf.shape(predictions)[0])
+        return tf.less(y, tf.constant(100))
     
     y = tf.constant(0)
     res = tf.while_loop(innerLoop_cond, innerLoop, [y, x, tf_l, predictions, labels, margin], name='innerloop')
     return tf.add(x, 1), res[2], predictions, labels, margin
 
 def outerLoop_condition(x, tf_l, predictions, labels, margin):
-    return tf.less(x, tf.shape(predictions)[0])
+    return tf.less(x, tf.constant(100))
 
 def pairwise_kl_divergence(labels, predictions):
     x = tf.constant(0)
@@ -59,12 +59,9 @@ def pairwise_kl_divergence(labels, predictions):
     #loss = tf.Variable(0.)
     #tf_l = tf.Variable(0. , name='loss')
     sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], name='outerloop')
-    n = tf.to_float(tf.shape(predictions)[0])
-    print n
+    n = tf.constant(100.)
     pairs = tf.multiply(n, tf.divide(tf.subtract(n, tf.constant(1.)), tf.constant(2.)))
-    print pairs
     loss = tf.divide(sum_loss[1], pairs)
-    print loss
     return loss
     
 if __name__ == "__main__":
