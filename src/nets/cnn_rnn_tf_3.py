@@ -122,7 +122,9 @@ class cnn_rnn_tf_3(object):
             gru_dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
             gru_out = gru_dense[-1]
 
-        #cnn_rnn_tf_3.logger.info("Attaching dense layer")
+        cnn_rnn_tf_3.logger.info("Attaching dense layer")
+        with tf.name_scope('Dense1'):
+            dense1 = tf.layers.dense(inputs=gru_out, units=200, activation=tf.nn.relu)
         #with tf.name_scope('Dense1'):
         #    dense1 = tf.layers.dense(inputs=gru_out, units=cnn_rnn_tf_3.stngs['total_speakers']*5, activation=tf.nn.relu)
         #with tf.name_scope('Dense2'):
@@ -130,7 +132,7 @@ class cnn_rnn_tf_3(object):
 
         cnn_rnn_tf_3.logger.info("Creating softmax layer")
         with tf.name_scope('Softmax'):
-            gru_soft_out = tf.layers.dense(inputs=gru_out, units=cnn_rnn_tf_3.stngs['total_speakers'], activation=tf.nn.softmax)
+            gru_soft_out = tf.layers.dense(inputs=dense1, units=cnn_rnn_tf_3.stngs['total_speakers'], activation=tf.nn.softmax)
 
         # Cross entropy and optimizer
         cnn_rnn_tf_3.logger.info("Create optimizer and loss function")
