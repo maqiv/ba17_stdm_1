@@ -3,7 +3,7 @@
   "segment_size": 100,
   "total_speakers": 100,
   "batch_size": 100,
-  "batch_loops": 10000,
+  "batch_loops": 30000,
 
   "tf_log_dir": "../data/experiments/logs/",
   "csv_file_pfx": "csv",
