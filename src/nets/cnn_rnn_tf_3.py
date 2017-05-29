@@ -127,9 +127,9 @@ class cnn_rnn_tf_3(object):
         #with tf.name_scope('Dense2'):
         #    dense2 = tf.layers.dense(inputs=dense1, units=cnn_rnn_tf_3.stngs['total_speakers']*10, activation=tf.nn.relu)
         with tf.name_scope('Dense1'):
-            dense1 = tf.layers.dense(inputs=gru_out, units=250, activation=tf.nn.relu)
+            dense1 = tf.layers.dense(inputs=gru_out, units=200, activation=tf.nn.relu)
         with tf.name_scope('Dense2'):
-            dense2 = tf.layers.dense(inputs=dense1, units=500, activation=tf.nn.relu)
+            dense2 = tf.layers.dense(inputs=dense1, units=250, activation=tf.nn.relu)
 
         cnn_rnn_tf_3.logger.info("Creating softmax layer")
         with tf.name_scope('Softmax'):
