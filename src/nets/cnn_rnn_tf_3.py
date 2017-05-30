@@ -25,7 +25,9 @@ class cnn_rnn_tf_3(object):
             n_filter2=64,
             n_kernel2=[8, 1],
             n_pool2=[4, 4],
-            n_strides2=[2, 2]
+            n_strides2=[2, 2],
+            n_dense1=200,
+            n_dense2=250
             ):
 
         cnn_rnn_tf_3.stngs = self.load_settings(network_settings_file)
@@ -37,6 +39,8 @@ class cnn_rnn_tf_3(object):
         self.n_kernel2 = n_kernel2
         self.n_pool2 = n_pool2
         self.n_strides2 = n_strides2
+        self.n_dense1 = n_dense1
+        self.n_dense2 = n_dense2
 
         self.initialize_logger()
         cnn_rnn_tf_3.logger.info("Calling run_network()")
@@ -122,14 +126,10 @@ class cnn_rnn_tf_3(object):
             gru_dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
             gru_out = gru_dense[-1]
 
-        #with tf.name_scope('Dense1'):
-        #    dense1 = tf.layers.dense(inputs=gru_out, units=cnn_rnn_tf_3.stngs['total_speakers']*5, activation=tf.nn.relu)
-        #with tf.name_scope('Dense2'):
-        #    dense2 = tf.layers.dense(inputs=dense1, units=cnn_rnn_tf_3.stngs['total_speakers']*10, activation=tf.nn.relu)
         with tf.name_scope('Dense1'):
-            dense1 = tf.layers.dense(inputs=gru_out, units=200, activation=tf.nn.relu)
+            dense1 = tf.layers.dense(inputs=gru_out, units=self.n_dense1, activation=tf.nn.relu)
         with tf.name_scope('Dense2'):
-            dense2 = tf.layers.dense(inputs=dense1, units=250, activation=tf.nn.relu)
+            dense2 = tf.layers.dense(inputs=dense1, units=self.n_dense2, activation=tf.nn.relu)
 
         cnn_rnn_tf_3.logger.info("Creating softmax layer")
         with tf.name_scope('Softmax'):
