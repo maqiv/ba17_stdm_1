@@ -171,6 +171,11 @@ class cnn_rnn_tf_3(object):
         cnn_rnn_tf_3.logger.info("  Shape: %s", pool1.shape)
         cnn_rnn_tf_3.logger.info("MaxPooling 2:")
         cnn_rnn_tf_3.logger.info("  Shape: %s", pool2.shape)
+        cnn_rnn_tf_3.logger.info("")
+        cnn_rnn_tf_3.logger.info("Dense 1:")
+        cnn_rnn_tf_3.logger.info("  Units: %s", self.n_dense1)
+        cnn_rnn_tf_3.logger.info("Dense 2:")
+        cnn_rnn_tf_3.logger.info("  Units: %s", self.n_dense2)
         cnn_rnn_tf_3.logger.info("-----------------------")
 
         return optimizer, gru_soft_out, gru_out, cross_entropy, accuracy, x_input, out_labels
