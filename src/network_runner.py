@@ -151,3 +151,16 @@ crt3.cnn_rnn_tf_3('nets/crt_settings.json',
                     n_dense1=200,
                     n_dense2=300
                 )
+
+crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[8, 1],
+                    n_pool1=[4, 4],
+                    n_strides1=[2, 1],
+                    n_filter2=64,
+                    n_kernel2=[6, 1],
+                    n_pool2=[3, 3],
+                    n_strides2=[2, 1],
+                    n_dense1=150,
+                    n_dense2=200
+                )
