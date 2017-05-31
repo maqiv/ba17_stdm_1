@@ -382,3 +382,9 @@ class cnn_rnn_tf_2(object):
         
         # Close the Tensorflow session
         sess.close()
+
+        # Remove Logging Handlers
+        for h in list(cnn_rnn_tf_0.logger.handlers):
+            cnn_rnn_tf_0.logger.removeHandler(h)
+            h.flush()
+            h.close()
