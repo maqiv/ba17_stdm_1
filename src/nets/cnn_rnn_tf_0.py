@@ -25,7 +25,8 @@ class cnn_rnn_tf_0(object):
             n_filter2=64,
             n_kernel2=[8, 1],
             n_pool2=[4, 4],
-            n_strides2=[2, 2]
+            n_strides2=[2, 2],
+            n_gru_neurons=256
             ):
 
         cnn_rnn_tf_0.stngs = self.load_settings(network_settings_file)
@@ -37,6 +38,7 @@ class cnn_rnn_tf_0(object):
         self.n_kernel2 = n_kernel2
         self.n_pool2 = n_pool2
         self.n_strides2 = n_strides2
+        self.n_gru_neurons = n_gru_neurons
 
         self.initialize_logger()
         cnn_rnn_tf_0.logger.info("Calling run_network()")
@@ -118,7 +120,7 @@ class cnn_rnn_tf_0(object):
         cnn_rnn_tf_0.logger.info("Creating GRU neurons")
         with tf.name_scope('GRU'):
             x_gru = tf.unstack(lstm_input, lstm_input.get_shape()[1], 1)
-            gru_cell = tf.contrib.rnn.GRUCell(cnn_rnn_tf_0.stngs['gru']['neurons_number'])
+            gru_cell = tf.contrib.rnn.GRUCell(self.n_gru_neurons)
             dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
             gru_out = dense[-1]
 
