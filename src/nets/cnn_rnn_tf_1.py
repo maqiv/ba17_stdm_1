@@ -288,7 +288,7 @@ class cnn_rnn_tf_1(object):
 	tf.reset_default_graph()
 
         # Remove Logging Handlers
-        for h in list(cnn_rnn_tf_0.logger.handlers):
-            cnn_rnn_tf_0.logger.removeHandler(h)
+        for h in list(cnn_rnn_tf_1.logger.handlers):
+            cnn_rnn_tf_1.logger.removeHandler(h)
             h.flush()
             h.close()

@@ -344,7 +344,7 @@ class cnn_rnn_tf_3(object):
         sess.close()
 
         # Remove Logging Handlers
-        for h in list(cnn_rnn_tf_0.logger.handlers):
-            cnn_rnn_tf_0.logger.removeHandler(h)
+        for h in list(cnn_rnn_tf_3.logger.handlers):
+            cnn_rnn_tf_3.logger.removeHandler(h)
             h.flush()
             h.close()

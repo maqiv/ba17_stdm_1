@@ -257,77 +257,77 @@ class cnn_rnn_tf_0(object):
         tb_saver.save(sess, model_meta_file)
 
         # Evaluate the network for 40 speakers
-        cnn_rnn_tf_3.logger.info("Loading train data for GRU evaluation for 40 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['gru']['data_path'], cnn_rnn_tf_3.stngs['gru']['train_data_file_40sp']), 'rb') as f:
+        cnn_rnn_tf_0.logger.info("Loading train data for GRU evaluation for 40 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['train_data_file_40sp']), 'rb') as f:
             (train_raw_x_data_40, raw_y_data_40, train_speaker_names_40) = pickle.load(f)
-            train_x_data_40, train_y_data_40 = dg.generate_test_data(train_raw_x_data_40, raw_y_data_40, segment_size=cnn_rnn_tf_3.stngs['segment_size'])
+            train_x_data_40, train_y_data_40 = dg.generate_test_data(train_raw_x_data_40, raw_y_data_40, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
         train_net_output_40 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data_40, [train_x_data_40.shape[0], train_x_data_40.shape[2], train_x_data_40.shape[3], train_x_data_40.shape[1]])}, session=sess)
 
-        cnn_rnn_tf_3.logger.info("Loading test data for GRU evaluation for 40 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['gru']['data_path'], cnn_rnn_tf_3.stngs['gru']['test_data_file_40sp']), 'rb') as f:
+        cnn_rnn_tf_0.logger.info("Loading test data for GRU evaluation for 40 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['test_data_file_40sp']), 'rb') as f:
             (test_raw_x_data_40, raw_y_data_40, test_speaker_names_40) = pickle.load(f)
-            test_x_data_40, test_y_data_40 = dg.generate_test_data(test_raw_x_data_40, raw_y_data_40, segment_size=cnn_rnn_tf_3.stngs['segment_size'])
+            test_x_data_40, test_y_data_40 = dg.generate_test_data(test_raw_x_data_40, raw_y_data_40, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
         test_net_output_40 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data_40, [test_x_data_40.shape[0], test_x_data_40.shape[2], test_x_data_40.shape[3], test_x_data_40.shape[1]])}, session=sess)
 
 
         # Write output file for clustering for 40 speakers
-        cnn_rnn_tf_3.logger.info("Write outcome to pickle files for clustering for 40 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['cluster_output_path'], (cnn_rnn_tf_3.stngs['cluster_output_train_file_40'] + self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_0.logger.info("Write outcome to pickle files for clustering for 40 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_train_file_40'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_40, train_y_data_40, train_speaker_names_40), f, -1)
 
-        with open(os.path.join(cnn_rnn_tf_3.stngs['cluster_output_path'], (cnn_rnn_tf_3.stngs['cluster_output_test_file_40'] + self.date_time + '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_test_file_40'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_40, test_y_data_40, test_speaker_names_40), f, -1)
 
         
         # Evaluate the network for 60 speakers
-        cnn_rnn_tf_3.logger.info("Loading train data for GRU evaluation for 60 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['gru']['data_path'], cnn_rnn_tf_3.stngs['gru']['train_data_file_60sp']), 'rb') as f:
+        cnn_rnn_tf_0.logger.info("Loading train data for GRU evaluation for 60 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['train_data_file_60sp']), 'rb') as f:
             (train_raw_x_data_60, raw_y_data_60, train_speaker_names_60) = pickle.load(f)
-            train_x_data_60, train_y_data_60 = dg.generate_test_data(train_raw_x_data_60, raw_y_data_60, segment_size=cnn_rnn_tf_3.stngs['segment_size'])
+            train_x_data_60, train_y_data_60 = dg.generate_test_data(train_raw_x_data_60, raw_y_data_60, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
         train_net_output_60 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data_60, [train_x_data_60.shape[0], train_x_data_60.shape[2], train_x_data_60.shape[3], train_x_data_60.shape[1]])}, session=sess)
 
-        cnn_rnn_tf_3.logger.info("Loading test data for GRU evaluation for 60 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['gru']['data_path'], cnn_rnn_tf_3.stngs['gru']['test_data_file_60sp']), 'rb') as f:
+        cnn_rnn_tf_0.logger.info("Loading test data for GRU evaluation for 60 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['test_data_file_60sp']), 'rb') as f:
             (test_raw_x_data_60, raw_y_data_60, test_speaker_names_60) = pickle.load(f)
-            test_x_data_60, test_y_data_60 = dg.generate_test_data(test_raw_x_data_60, raw_y_data_60, segment_size=cnn_rnn_tf_3.stngs['segment_size'])
+            test_x_data_60, test_y_data_60 = dg.generate_test_data(test_raw_x_data_60, raw_y_data_60, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
         test_net_output_60 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data_60, [test_x_data_60.shape[0], test_x_data_60.shape[2], test_x_data_60.shape[3], test_x_data_60.shape[1]])}, session=sess)
 
 
         # Write output file for clustering for 60 speakers
-        cnn_rnn_tf_3.logger.info("Write outcome to pickle files for clustering for 60 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['cluster_output_path'], (cnn_rnn_tf_3.stngs['cluster_output_train_file_60'] + self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_0.logger.info("Write outcome to pickle files for clustering for 60 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_train_file_60'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_60, train_y_data_60, train_speaker_names_60), f, -1)
 
-        with open(os.path.join(cnn_rnn_tf_3.stngs['cluster_output_path'], (cnn_rnn_tf_3.stngs['cluster_output_test_file_60'] + self.date_time + '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_test_file_60'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_60, test_y_data_60, test_speaker_names_60), f, -1)
         
         
         # Evaluate the network for 80 speakers
-        cnn_rnn_tf_3.logger.info("Loading train data for GRU evaluation for 80 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['gru']['data_path'], cnn_rnn_tf_3.stngs['gru']['train_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_0.logger.info("Loading train data for GRU evaluation for 80 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['train_data_file_80sp']), 'rb') as f:
             (train_raw_x_data_80, raw_y_data_80, train_speaker_names_80) = pickle.load(f)
-            train_x_data_80, train_y_data_80 = dg.generate_test_data(train_raw_x_data_80, raw_y_data_80, segment_size=cnn_rnn_tf_3.stngs['segment_size'])
+            train_x_data_80, train_y_data_80 = dg.generate_test_data(train_raw_x_data_80, raw_y_data_80, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
         train_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data_80, [train_x_data_80.shape[0], train_x_data_80.shape[2], train_x_data_80.shape[3], train_x_data_80.shape[1]])}, session=sess)
 
-        cnn_rnn_tf_3.logger.info("Loading test data for GRU evaluation for 80 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['gru']['data_path'], cnn_rnn_tf_3.stngs['gru']['test_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_0.logger.info("Loading test data for GRU evaluation for 80 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['gru']['data_path'], cnn_rnn_tf_0.stngs['gru']['test_data_file_80sp']), 'rb') as f:
             (test_raw_x_data_80, raw_y_data_80, test_speaker_names_80) = pickle.load(f)
-            test_x_data_80, test_y_data_80 = dg.generate_test_data(test_raw_x_data_80, raw_y_data_80, segment_size=cnn_rnn_tf_3.stngs['segment_size'])
+            test_x_data_80, test_y_data_80 = dg.generate_test_data(test_raw_x_data_80, raw_y_data_80, segment_size=cnn_rnn_tf_0.stngs['segment_size'])
 
         test_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data_80, [test_x_data_80.shape[0], test_x_data_80.shape[2], test_x_data_80.shape[3], test_x_data_80.shape[1]])}, session=sess)
 
 
         # Write output file for clustering for 80 speakers
-        cnn_rnn_tf_3.logger.info("Write outcome to pickle files for clustering for 80 speakers")
-        with open(os.path.join(cnn_rnn_tf_3.stngs['cluster_output_path'], (cnn_rnn_tf_3.stngs['cluster_output_train_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_0.logger.info("Write outcome to pickle files for clustering for 80 speakers")
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_train_file_80'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_80, train_y_data_80, train_speaker_names_80), f, -1)
 
-        with open(os.path.join(cnn_rnn_tf_3.stngs['cluster_output_path'], (cnn_rnn_tf_3.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_0.stngs['cluster_output_path'], (cnn_rnn_tf_0.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_80, test_y_data_80, test_speaker_names_80), f, -1)
 
         # Close the Tensorflow session
