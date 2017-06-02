@@ -103,6 +103,8 @@ class cnn_rnn_tf_1(object):
             dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
             gru_out = dense[-1]
 
+
+        cnn_rnn_tf_1.logger.info("Creating Dense Layer")
         with tf.name_scope('dense1'):
             dense1 = tf.layers.dense(inputs=gru_out, units=200, activation=tf.nn.relu)
 
@@ -176,7 +178,7 @@ class cnn_rnn_tf_1(object):
         start_time = time.time()
         for step in range(cnn_rnn_tf_1.stngs['batch_loops']):
             # Get next batch
-            if step < 30:
+            if step < 8000:
                 x_b_t, y_b = train_gen.next()
                 # Reshape the x_b batch with channel as last dimension
                 x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
@@ -315,6 +317,99 @@ class cnn_rnn_tf_1(object):
             pickle.dump((train_net_output_60, train_y_data, train_speaker_names), f, -1)
         
         with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_60'] + self.date_time +  '.pickle')), 'wb') as f:
+            pickle.dump((test_net_output_60, test_y_data, test_speaker_names), f, -1)
+
+        cnn_rnn_tf_1.logger.info("Loading test data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_80sp']), 'rb') as f:
+            (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        test_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
+       
+        cnn_rnn_tf_1.logger.info("Loading train data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_80sp']), 'rb') as f:
+            (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        train_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
+
+
+
+        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((train_net_output_80, train_y_data, train_speaker_names), f, -1)
+        
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((test_net_output_80, test_y_data, test_speaker_names), f, -1)
+
+
+        ## dense out
+        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_80sp']), 'rb') as f:
+            (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        test_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
+       
+        cnn_rnn_tf_1.logger.info("Loading train data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_80sp']), 'rb') as f:
+            (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        train_net_output_80 = dense1.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
+
+
+
+        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_80'] +'dense1'+ self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((train_net_output_80, train_y_data, train_speaker_names), f, -1)
+        
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_80'] +'dense1'+ self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((test_net_output_80, test_y_data, test_speaker_names), f, -1)
+
+
+        cnn_rnn_tf_1.logger.info("Loading train data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_40sp']), 'rb') as f:
+            (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        train_net_output = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
+        
+        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_40sp']), 'rb') as f:
+            (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        test_net_output = dense1.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
+
+        # Write output file for clustering
+        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_40'] +'_dense1_'+ self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((train_net_output, train_y_data, train_speaker_names), f, -1)
+        
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_40'] +'_dense1_'+ self.date_time +  '.pickle')), 'wb') as f:
+            pickle.dump((test_net_output, test_y_data, test_speaker_names), f, -1)
+
+
+        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_60sp']), 'rb') as f:
+            (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        test_net_output_60 = dense1.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
+       
+        cnn_rnn_tf_1.logger.info("Loading train data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_60sp']), 'rb') as f:
+            (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+
+        train_net_output_60 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
+        
+        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_60'] +'_dense1_'+ self.date_time + '.pickle')), 'wb') as f:
+            pickle.dump((train_net_output_60, train_y_data, train_speaker_names), f, -1)
+        
+        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_60'] +'_dense1_'+ self.date_time +  '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_60, test_y_data, test_speaker_names), f, -1)
 
 
