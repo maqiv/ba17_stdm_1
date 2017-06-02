@@ -9,12 +9,16 @@
 #import nets.bilstm_2layer_dropout_plus_2dense as lstm2_dense
 #import nets.bilstm_4layer_plus_dense as lstm4_dense
 #import nets.bilstm_2layer_dropout_kld as bi2dkld
-#import nets.cnn_rnn_tf_0 as crt0
+import nets.cnn_rnn_tf_0 as crt0
 #import nets.cnn_rnn_tf_1 as crt1
 #import nets.bilstm_tf_1 as bt1
 #import nets.cnn_rnn_tf_2 as crt2
+
 import nets.cnn_rnn_tf_3 as crt3
 import nets.cnn_rnn_tf_4 as crt4
+
+#import nets.cnn_rnn_tf_3 as crt3
+
 
 
 
@@ -54,16 +58,53 @@ crt4.cnn_rnn_tf_1('nets/crt_settings.json')
 #                    n_strides2=[2, 2],
 #                )
 #
-#crt0.cnn_rnn_tf_0('nets/crt_settings.json',
-#                    n_filter1=32,
-#                    n_kernel1=[8, 1],
-#                    n_pool1=[4, 1],
-#                    n_strides1=[2, 1],
-#                    n_filter2=64,
-#                    n_kernel2=[8, 1],
-#                    n_pool2=[4, 1],
-#                    n_strides2=[2, 1],
-#                )
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[8, 1],
+                    n_pool1=[4, 1],
+                    n_strides1=[2, 1],
+                    n_filter2=64,
+                    n_kernel2=[8, 1],
+                    n_pool2=[4, 1],
+                    n_strides2=[2, 1],
+                    n_gru_neurons=64
+                )
+
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[8, 1],
+                    n_pool1=[4, 1],
+                    n_strides1=[2, 1],
+                    n_filter2=64,
+                    n_kernel2=[8, 1],
+                    n_pool2=[4, 1],
+                    n_strides2=[2, 1],
+                    n_gru_neurons=128
+                )
+
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[8, 1],
+                    n_pool1=[4, 1],
+                    n_strides1=[2, 1],
+                    n_filter2=64,
+                    n_kernel2=[8, 1],
+                    n_pool2=[4, 1],
+                    n_strides2=[2, 1],
+                    n_gru_neurons=256
+                )
+
+crt0.cnn_rnn_tf_0('nets/crt_settings.json',
+                    n_filter1=32,
+                    n_kernel1=[8, 1],
+                    n_pool1=[4, 1],
+                    n_strides1=[2, 1],
+                    n_filter2=64,
+                    n_kernel2=[8, 1],
+                    n_pool2=[4, 1],
+                    n_strides2=[2, 1],
+                    n_gru_neurons=512
+                )
 
 #crt0.cnn_rnn_tf_0('nets/crt_settings.json',
 #                    n_filter1=32,
@@ -128,7 +169,8 @@ crt4.cnn_rnn_tf_1('nets/crt_settings.json')
 #                )
 
 
-
+<<<<<<< HEAD
+=======
 #crt3.cnn_rnn_tf_3('nets/crt_settings.json',
 #                    n_filter1=32,
 #                    n_kernel1=[8, 1],
@@ -141,7 +183,8 @@ crt4.cnn_rnn_tf_1('nets/crt_settings.json')
 #                    n_dense1=200,
 #                    n_dense2=250
 #                )
-#
+>>>>>>> d411b49468785603e9bcc82a5788daac2a3d467a
+
 #crt3.cnn_rnn_tf_3('nets/crt_settings.json',
 #                    n_filter1=32,
 #                    n_kernel1=[8, 1],
@@ -152,7 +195,11 @@ crt4.cnn_rnn_tf_1('nets/crt_settings.json')
 #                    n_pool2=[3, 3],
 #                    n_strides2=[2, 1],
 #                    n_dense1=200,
+<<<<<<< HEAD
+#                    n_dense2=250
+=======
 #                    n_dense2=300
+>>>>>>> d411b49468785603e9bcc82a5788daac2a3d467a
 #                )
 #
 #crt3.cnn_rnn_tf_3('nets/crt_settings.json',
@@ -164,6 +211,124 @@ crt4.cnn_rnn_tf_1('nets/crt_settings.json')
 #                    n_kernel2=[6, 1],
 #                    n_pool2=[3, 3],
 #                    n_strides2=[2, 1],
+<<<<<<< HEAD
+#                    n_dense1=200,
+#                    n_dense2=300
+=======
 #                    n_dense1=150,
 #                    n_dense2=200
+#                )
+
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=200
+>>>>>>> d411b49468785603e9bcc82a5788daac2a3d467a
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+<<<<<<< HEAD
+#                    n_dense1=150,
+#                    n_dense2=200
+=======
+#                    n_dense1=200
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=200
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=175
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=175
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=175
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=150
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=150
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=150
+>>>>>>> d411b49468785603e9bcc82a5788daac2a3d467a
 #                )

@@ -103,26 +103,38 @@ class cnn_rnn_tf_1(object):
             dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
             gru_out = dense[-1]
 
+        with tf.name_scope('dense1'):
+            dense1 = tf.layers.dense(inputs=gru_out, units=200, activation=tf.nn.relu)
+
+
+
         cnn_rnn_tf_1.logger.info("Creating softmax layer")
         with tf.name_scope('Softmax'):
-            gru_soft_out = tf.layers.dense(inputs=gru_out, units=cnn_rnn_tf_1.stngs['total_speakers'], activation=tf.nn.softmax)
+            gru_soft_out = tf.layers.dense(inputs=dense1, units=cnn_rnn_tf_1.stngs['total_speakers'], activation=tf.nn.softmax)
 
 
         # Cross entropy and optimizer
         cnn_rnn_tf_1.logger.info("Create optimizer and loss function")
-        with tf.name_scope('Optimizer'):
+        with tf.name_scope('Kld_Optimizer'):
             cnn_rnn_tf_1.logger.info("Create kld function")
             kld_loss = kld.pairwise_kl_divergence(out_labels, gru_soft_out)
-            tf.summary.scalar('loss', kld_loss)
+            tf.summary.scalar('kld_loss', kld_loss)
             cnn_rnn_tf_1.logger.info("Create AdamOptimizer and add kld_loss as minimize function")
-            optimizer = tf.train.AdamOptimizer().minimize(kld_loss)
+            optimizer_kld = tf.train.AdamOptimizer().minimize(kld_loss)
+
+
+        with tf.name_scope('XE_Optimizer'):
+            cnn_rnn_tf_1.logger.info("Create XE function")
+            cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=gru_soft_out, labels=out_labels))
+            tf.summary.scalar('loss', cross_entropy)
+            optimizer_xe = tf.train.AdamOptimizer().minimize(cross_entropy)
 
         with tf.name_scope('Accuracy'):
             correct_pred = tf.equal(tf.argmax(gru_soft_out, 1), tf.argmax(out_labels, 1))
             accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
             tf.summary.scalar('accuracy', accuracy)
         
-        return optimizer, gru_soft_out, gru_out, kld_loss, accuracy, x_input, out_labels
+        return optimizer_kld, optimizer_xe, gru_soft_out, gru_out, kld_loss, cross_entropy, accuracy, x_input, out_labels
 
     
     def run_network(self):
@@ -133,7 +145,7 @@ class cnn_rnn_tf_1(object):
         val_gen = dg.batch_generator(X_v, y_v, batch_size=cnn_rnn_tf_1.stngs['batch_size'], segment_size=cnn_rnn_tf_1.stngs['segment_size'])
         # Create network model and tensors
         cnn_rnn_tf_1.logger.info("Initialize network model")
-        optimizer, gru_soft_out, gru_out, kld_loss, accuracy, x_input, out_labels = self.create_net()
+        optimizer_kld, optimizer_xe, gru_soft_out, gru_out, kld_loss, cross_entropy, accuracy, x_input, out_labels = self.create_net()
         
         # CNN Training
         cnn_rnn_tf_1.logger.info("Initialize tensorflow session")
@@ -164,47 +176,94 @@ class cnn_rnn_tf_1(object):
         start_time = time.time()
         for step in range(cnn_rnn_tf_1.stngs['batch_loops']):
             # Get next batch
-            x_b_t, y_b = train_gen.next()
-            # Reshape the x_b batch with channel as last dimension
-            x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
-            train_feed_dict = { x_input: x_b, out_labels: y_b }
-
-            # Execute training
-            _, loss_value = sess.run([optimizer, kld_loss], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
-            sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
-            
-            # Validation
-            if step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
-                # Get next batch
-                x_vb_t, y_vb = val_gen.next()
+            if step < 30:
+                x_b_t, y_b = train_gen.next()
                 # Reshape the x_b batch with channel as last dimension
-                x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
-                val_feed_dict = { x_input: x_vb, out_labels: y_vb }
-
+                x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                train_feed_dict = { x_input: x_b, out_labels: y_b }
+    
                 # Execute training
-                val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
-                val_loss = sess.run(kld_loss, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+                _, loss_value = sess.run([optimizer_xe, cross_entropy], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
+                sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
+                
+                # Validation
+                if step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
+                    # Get next batch
+                    x_vb_t, y_vb = val_gen.next()
+                    # Reshape the x_b batch with channel as last dimension
+                    x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                    val_feed_dict = { x_input: x_vb, out_labels: y_vb }
+    
+                    # Execute training
+                    val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+                    val_loss = sess.run(cross_entropy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+    
+                    duration = time.time() - start_time
+                    cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
+                    csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
+                    start_time = time.time()
+    
+                # Write summary data for tensorboard
+                if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
+                    tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
+                    tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
+                    tb_train_writer.add_summary(tb_train_summary_str, step)
+                    tb_train_writer.flush()
+    
+                    tb_val_summary_str = sess.run(tb_merged, feed_dict=val_feed_dict)
+                    tb_val_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
+                    tb_val_writer.add_summary(tb_val_summary_str, step)
+                    tb_val_writer.flush()
+    
+                if (step + 1) % cnn_rnn_tf_1.stngs['ckpt_write_interval'] == 0:
+                    ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['ckpt_file_pfx'])
+                    tb_saver.save(sess, ckpt_file, global_step=step)
+    
+            
 
-                duration = time.time() - start_time
-                cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
-                csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
-                start_time = time.time()
+            else:
+                x_b_t, y_b = train_gen.next()
+                # Reshape the x_b batch with channel as last dimension
+                x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                train_feed_dict = { x_input: x_b, out_labels: y_b }
+    
+                # Execute training
+                _, loss_value = sess.run([optimizer_kld, kld_loss], feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
+                sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
+                
+                # Validation
+                if step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
+                    # Get next batch
+                    x_vb_t, y_vb = val_gen.next()
+                    # Reshape the x_b batch with channel as last dimension
+                    x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                    val_feed_dict = { x_input: x_vb, out_labels: y_vb }
+    
+                    # Execute training
+                    val_acc = sess.run(accuracy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+                    val_loss = sess.run(kld_loss, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
+    
+                    duration = time.time() - start_time
+                    cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
+                    csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
+                    start_time = time.time()
+    
+                # Write summary data for tensorboard
+                if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
+                    tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
+                    tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
+                    tb_train_writer.add_summary(tb_train_summary_str, step)
+                    tb_train_writer.flush()
+    
+                    tb_val_summary_str = sess.run(tb_merged, feed_dict=val_feed_dict)
+                    tb_val_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
+                    tb_val_writer.add_summary(tb_val_summary_str, step)
+                    tb_val_writer.flush()
+    
+                if (step + 1) % cnn_rnn_tf_1.stngs['ckpt_write_interval'] == 0:
+                    ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['ckpt_file_pfx'])
+                    tb_saver.save(sess, ckpt_file, global_step=step)
 
-            # Write summary data for tensorboard
-            if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
-                tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
-                tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
-                tb_train_writer.add_summary(tb_train_summary_str, step)
-                tb_train_writer.flush()
-
-                tb_val_summary_str = sess.run(tb_merged, feed_dict=val_feed_dict)
-                tb_val_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
-                tb_val_writer.add_summary(tb_val_summary_str, step)
-                tb_val_writer.flush()
-
-            if (step + 1) % cnn_rnn_tf_1.stngs['ckpt_write_interval'] == 0:
-                ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['ckpt_file_pfx'])
-                tb_saver.save(sess, ckpt_file, global_step=step)
 
         csv_file_handler.close()
 
@@ -284,11 +343,6 @@ class cnn_rnn_tf_1(object):
         with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_80, test_y_data, test_speaker_names), f, -1)
 
+	cnn_rnn_tf1.logger.info("output genration finished")
 	sess.close()
 	tf.reset_default_graph()
-
-        # Remove Logging Handlers
-        for h in list(cnn_rnn_tf_1.logger.handlers):
-            cnn_rnn_tf_1.logger.removeHandler(h)
-            h.flush()
-            h.close()
