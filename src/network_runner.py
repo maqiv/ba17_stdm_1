@@ -14,6 +14,7 @@
 #import nets.bilstm_tf_1 as bt1
 #import nets.cnn_rnn_tf_2 as crt2
 import nets.cnn_rnn_tf_3 as crt3
+import nets.cnn_rnn_tf_4 as crt4
 
 
 
@@ -39,6 +40,7 @@ import nets.cnn_rnn_tf_3 as crt3
 #network = test.test('test01', 'test_data_10_not_clustering_vs_reynolds.pickle', n_classes=10, n_epoch=4)
 #network.run_network()
 
+crt4.cnn_rnn_tf_1('nets/crt_settings.json')
 #crt1.cnn_rnn_tf_1('nets/crt_settings.json')
 
 #crt0.cnn_rnn_tf_0('nets/crt_settings.json',
@@ -126,41 +128,42 @@ import nets.cnn_rnn_tf_3 as crt3
 #                )
 
 
-crt3.cnn_rnn_tf_3('nets/crt_settings.json',
-                    n_filter1=32,
-                    n_kernel1=[8, 1],
-                    n_pool1=[4, 4],
-                    n_strides1=[2, 1],
-                    n_filter2=64,
-                    n_kernel2=[6, 1],
-                    n_pool2=[3, 3],
-                    n_strides2=[2, 1],
-                    n_dense1=200,
-                    n_dense2=250
-                )
 
-crt3.cnn_rnn_tf_3('nets/crt_settings.json',
-                    n_filter1=32,
-                    n_kernel1=[8, 1],
-                    n_pool1=[4, 4],
-                    n_strides1=[2, 1],
-                    n_filter2=64,
-                    n_kernel2=[6, 1],
-                    n_pool2=[3, 3],
-                    n_strides2=[2, 1],
-                    n_dense1=200,
-                    n_dense2=300
-                )
-
-crt3.cnn_rnn_tf_3('nets/crt_settings.json',
-                    n_filter1=32,
-                    n_kernel1=[8, 1],
-                    n_pool1=[4, 4],
-                    n_strides1=[2, 1],
-                    n_filter2=64,
-                    n_kernel2=[6, 1],
-                    n_pool2=[3, 3],
-                    n_strides2=[2, 1],
-                    n_dense1=150,
-                    n_dense2=200
-                )
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=200,
+#                    n_dense2=250
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=200,
+#                    n_dense2=300
+#                )
+#
+#crt3.cnn_rnn_tf_3('nets/crt_settings.json',
+#                    n_filter1=32,
+#                    n_kernel1=[8, 1],
+#                    n_pool1=[4, 4],
+#                    n_strides1=[2, 1],
+#                    n_filter2=64,
+#                    n_kernel2=[6, 1],
+#                    n_pool2=[3, 3],
+#                    n_strides2=[2, 1],
+#                    n_dense1=150,
+#                    n_dense2=200
+#                )
