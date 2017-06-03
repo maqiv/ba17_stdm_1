@@ -16,6 +16,7 @@ import nets.cnn_rnn_tf_0 as crt0
 
 import nets.cnn_rnn_tf_3 as crt3
 import nets.cnn_rnn_tf_4 as crt4
+import nets.cnn_rnn_tf_5_cont as crt5
 
 #import nets.cnn_rnn_tf_3 as crt3
 
@@ -44,7 +45,7 @@ import nets.cnn_rnn_tf_4 as crt4
 #network = test.test('test01', 'test_data_10_not_clustering_vs_reynolds.pickle', n_classes=10, n_epoch=4)
 #network.run_network()
 
-crt4.cnn_rnn_tf_1('nets/crt_settings.json')
+crt5.cnn_rnn_tf_1('nets/crt_settings.json')
 #crt1.cnn_rnn_tf_1('nets/crt_settings.json')
 
 #crt0.cnn_rnn_tf_0('nets/crt_settings.json',
