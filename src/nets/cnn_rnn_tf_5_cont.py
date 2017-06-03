@@ -101,7 +101,6 @@ class cnn_rnn_tf_1(object):
         optimizer = graph.get_operation_by_name('Optimizer/Adam')
         cross_entropy = graph.get_tensor_by_name('Optimizer/Mean:0')
         #accuracy = graph.get_tensor_by_name()
-        sess.run(tf.global_variables_initializer())
         cnn_rnn_tf_1.logger.info("Initialize network model")
         accuracy = self.create_optimizer(gru_soft_out, out_labels)
 
