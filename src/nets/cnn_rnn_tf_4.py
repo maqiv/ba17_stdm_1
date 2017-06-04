@@ -178,7 +178,7 @@ class cnn_rnn_tf_1(object):
         start_time = time.time()
         for step in range(cnn_rnn_tf_1.stngs['batch_loops']):
             # Get next batch
-            if step < 8000:
+            if step < 0:
                 x_b_t, y_b = train_gen.next()
                 # Reshape the x_b batch with channel as last dimension
                 x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
