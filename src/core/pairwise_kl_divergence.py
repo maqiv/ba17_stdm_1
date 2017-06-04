@@ -47,7 +47,7 @@ def outerLoop(x, tf_l, predictions, labels, margin):
         return tf.less(y, tf.constant(100))
     
     y = tf.constant(0)
-    res = tf.while_loop(innerLoop_cond, innerLoop, [y, x, tf_l, predictions, labels, margin], swap_memory=True, parallel_iterations = 10,  name='innerloop')
+    res = tf.while_loop(innerLoop_cond, innerLoop, [y, x, tf_l, predictions, labels, margin], swap_memory=True, parallel_iterations = 100,  name='innerloop')
     return tf.add(x, 1), res[2], predictions, labels, margin
 
 def outerLoop_condition(x, tf_l, predictions, labels, margin):
@@ -58,7 +58,7 @@ def pairwise_kl_divergence(labels, predictions):
     #margin = tf.constant(2.)
     #loss = tf.Variable(0.)
     #tf_l = tf.Variable(0. , name='loss')
-    sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], swap_memory=True, parallel_iterations = 10, name='outerloop')
+    sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], swap_memory=True, parallel_iterations = 100, name='outerloop')
     n = tf.constant(100.)
     pairs = tf.multiply(n, tf.divide(tf.subtract(n, tf.constant(1.)), tf.constant(2.)))
     loss = tf.divide(sum_loss[1], pairs)

@@ -136,7 +136,7 @@ class cnn_rnn_tf_1(object):
             accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
             tf.summary.scalar('accuracy', accuracy)
         
-        return optimizer_kld, optimizer_xe, gru_soft_out, gru_out, kld_loss, cross_entropy, accuracy, x_input, out_labels
+        return optimizer_kld, optimizer_xe, gru_soft_out, gru_out, kld_loss, cross_entropy, accuracy, x_input, out_labels, dense1
 
     
     def run_network(self):
@@ -147,7 +147,7 @@ class cnn_rnn_tf_1(object):
         val_gen = dg.batch_generator(X_v, y_v, batch_size=cnn_rnn_tf_1.stngs['batch_size'], segment_size=cnn_rnn_tf_1.stngs['segment_size'])
         # Create network model and tensors
         cnn_rnn_tf_1.logger.info("Initialize network model")
-        optimizer_kld, optimizer_xe, gru_soft_out, gru_out, kld_loss, cross_entropy, accuracy, x_input, out_labels = self.create_net()
+        optimizer_kld, optimizer_xe, gru_soft_out, gru_out, kld_loss, cross_entropy, accuracy, x_input, out_labels, dense1 = self.create_net()
         
         # CNN Training
         cnn_rnn_tf_1.logger.info("Initialize tensorflow session")
