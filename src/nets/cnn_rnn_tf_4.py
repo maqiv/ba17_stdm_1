@@ -6,7 +6,7 @@ import logging
 import datetime
 import numpy as np
 import tensorflow as tf
-import core.pairwise_kl_divergence as kld
+import core.pairwise_kl_divergence_cpu as kld
 
 import core.data_gen as dg
 import cPickle as pickle
@@ -99,7 +99,7 @@ class cnn_rnn_tf_1(object):
         cnn_rnn_tf_1.logger.info("Creating GRU neurons")
         with tf.name_scope('GRU'):
             x_gru = tf.unstack(lstm_input, lstm_input.get_shape()[1], 1)
-            gru_cell = tf.contrib.rnn.GRUCell(cnn_rnn_tf_1.stngs['gru']['neurons_number'])
+            gru_cell = tf.contrib.rnn.GRUCell(256)
             dense, _ = tf.contrib.rnn.static_rnn(gru_cell, x_gru, dtype='float')
             gru_out = dense[-1]
 
@@ -176,7 +176,7 @@ class cnn_rnn_tf_1(object):
 
         cnn_rnn_tf_1.logger.info("Start training")
         start_time = time.time()
-        for step in range(cnn_rnn_tf_1.stngs['batch_loops']):
+        for step in range(18000):
             # Get next batch
             if step < 0:
                 x_b_t, y_b = train_gen.next()
