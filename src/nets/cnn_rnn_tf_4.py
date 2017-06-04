@@ -6,7 +6,7 @@ import logging
 import datetime
 import numpy as np
 import tensorflow as tf
-import core.pairwise_kl_divergence_cpu as kld
+import core.pairwise_kl_divergence as kld
 
 import core.data_gen as dg
 import cPickle as pickle
@@ -176,9 +176,9 @@ class cnn_rnn_tf_1(object):
 
         cnn_rnn_tf_1.logger.info("Start training")
         start_time = time.time()
-        for step in range(18000):
+        for step in range(17000):
             # Get next batch
-            if step < 0:
+            if step < 15000:
                 x_b_t, y_b = train_gen.next()
                 # Reshape the x_b batch with channel as last dimension
                 x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
@@ -262,7 +262,7 @@ class cnn_rnn_tf_1(object):
                     tb_val_writer.add_summary(tb_val_summary_str, step)
                     tb_val_writer.flush()
     
-                if (step + 1) % cnn_rnn_tf_1.stngs['ckpt_write_interval'] == 0:
+                if (step + 1) % 1000 == 0:
                     ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['ckpt_file_pfx'])
                     tb_saver.save(sess, ckpt_file, global_step=step)
 
