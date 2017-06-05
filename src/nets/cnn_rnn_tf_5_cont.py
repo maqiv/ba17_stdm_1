@@ -17,7 +17,7 @@ class cnn_rnn_tf_5_cont(object):
     date_time = None
 
     def __init__(self, network_settings_file, sess_dir):
-        cnn_rnn_tf_1.stngs = self.load_settings(network_settings_file)
+        cnn_rnn_tf_5_cont.stngs = self.load_settings(network_settings_file)
         self.sess_dir = sess_dir
         self.initialize_logger()
         cnn_rnn_tf_5_cont.logger.info("Calling run_network()")
