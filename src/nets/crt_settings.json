@@ -3,7 +3,7 @@
   "segment_size": 100,
   "total_speakers": 100,
   "batch_size": 100,
-  "batch_loops": 10000,
+  "batch_loops": 30000,
 
   "tf_log_dir": "../data/experiments/logs/",
   "csv_file_pfx": "csv",
@@ -11,8 +11,8 @@
   "model_file_name": "final_model.save",
 
   "validation_calc_interval": 10,
-  "summary_write_interval": 50,
-  "ckpt_write_interval": 300,
+  "summary_write_interval": 100,
+  "ckpt_write_interval": 1000,
 
   "logging": {
     "level": "DEBUG",
