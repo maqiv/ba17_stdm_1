@@ -69,7 +69,7 @@ class cnn_rnn_tf_5_cont(object):
 
     def create_optimizer(self, gru_soft_out, out_labels):
     # Create basic net infrastructure
-        cnn_rnn_tf_1.logger.info("Create loss function")
+        cnn_rnn_tf_5_cont.logger.info("Create loss function")
 
         with tf.name_scope('ACC'):
             correct_pred = tf.equal(tf.argmax(gru_soft_out, 1), tf.argmax(out_labels, 1))
@@ -104,7 +104,7 @@ class cnn_rnn_tf_5_cont(object):
         optimizer = graph.get_operation_by_name('Optimizer/Adam')
         cross_entropy = graph.get_tensor_by_name('Optimizer/Mean:0')
         #accuracy = graph.get_tensor_by_name()
-        cnn_rnn_tf_1.logger.info("Initialize network model")
+        cnn_rnn_tf_5_cont.logger.info("Initialize network model")
         accuracy = self.create_optimizer(gru_soft_out, out_labels)
 
         # Tensorboard
@@ -152,7 +152,7 @@ class cnn_rnn_tf_5_cont(object):
             cnn_rnn_tf_5_cont.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
             csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
 
-            if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
+            if (step + 1) % cnn_rnn_tf_5_cont.stngs['summary_write_interval'] == 0:
                 tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
                 tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
                 tb_train_writer.add_summary(tb_train_summary_str, step)
@@ -163,7 +163,7 @@ class cnn_rnn_tf_5_cont(object):
                 tb_val_writer.add_summary(tb_val_summary_str, step)
                 tb_val_writer.flush()
 
-            if (step + 1) % cnn_rnn_tf_1.stngs['ckpt_write_interval'] == 0:
+            if (step + 1) % cnn_rnn_tf_5_cont.stngs['ckpt_write_interval'] == 0:
                 ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_5_cont.stngs['ckpt_file_pfx'])
                 tb_saver.save(sess, ckpt_file, global_step=step)
 
