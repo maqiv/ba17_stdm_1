@@ -11,7 +11,9 @@ import core.data_gen as dg
 import cPickle as pickle
 
 class cnn_rnn_tf_5_cont(object):
-
+    '''
+        This File allows, to load a a tf model checkpoint, specified in the network_settings_file and continue Training.
+    '''
     stngs = None
     logger = None
     date_time = None
