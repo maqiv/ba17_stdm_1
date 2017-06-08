@@ -11,16 +11,19 @@ import core.pairwise_kl_divergence as kld
 import core.data_gen as dg
 import cPickle as pickle
 
-class cnn_rnn_tf_1(object):
+'''This class trains a CNN-GRU layer combination with the PKLD
+'''
+
+class cnn_rnn_tf_4(object):
     
     stngs = None
     logger = None
     date_time = None
     
     def __init__(self, network_settings_file):
-        cnn_rnn_tf_1.stngs = self.load_settings(network_settings_file)
+        cnn_rnn_tf_4.stngs = self.load_settings(network_settings_file)
         self.initialize_logger()
-        cnn_rnn_tf_1.logger.info("Calling run_network()")
+        cnn_rnn_tf_4.logger.info("Calling run_network()")
         self.run_network()
     
     def initialize_logger(self):
@@ -30,18 +33,18 @@ class cnn_rnn_tf_1(object):
                             today_now.hour, today_now.minute, today_now.second)
 
         # Python logger
-        cnn_rnn_tf_1.logger = logging.getLogger(__name__)
-        cnn_rnn_tf_1.logger.setLevel(logging.getLevelName(cnn_rnn_tf_1.stngs['logging']['level']))
+        cnn_rnn_tf_4.logger = logging.getLogger(__name__)
+        cnn_rnn_tf_4.logger.setLevel(logging.getLevelName(cnn_rnn_tf_4.stngs['logging']['level']))
 
-        log_file_name = cnn_rnn_tf_1.stngs['logging']['file_name_prefix'] + self.date_time + '.log'
+        log_file_name = cnn_rnn_tf_4.stngs['logging']['file_name_prefix'] + self.date_time + '.log'
 
-        log_file_path = os.path.join(cnn_rnn_tf_1.stngs['logging']['file_path'], log_file_name)
+        log_file_path = os.path.join(cnn_rnn_tf_4.stngs['logging']['file_path'], log_file_name)
         log_file_handler = logging.FileHandler(log_file_path)
-        log_file_handler.setLevel(logging.getLevelName(cnn_rnn_tf_1.stngs['logging']['level']))
+        log_file_handler.setLevel(logging.getLevelName(cnn_rnn_tf_4.stngs['logging']['level']))
         log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         log_file_handler.setFormatter(log_formatter)
 
-        cnn_rnn_tf_1.logger.addHandler(log_file_handler)
+        cnn_rnn_tf_4.logger.addHandler(log_file_handler)
 
         
     def load_settings(self, settings_file):
@@ -54,13 +57,13 @@ class cnn_rnn_tf_1(object):
         current_workdir = os.getcwd()
         tstamp = int(time.time())
         sess_dir_name = 'sess_%s' % tstamp
-        dirty_path = os.path.join(current_workdir, cnn_rnn_tf_1.stngs['tf_log_dir'], sess_dir_name)
+        dirty_path = os.path.join(current_workdir, cnn_rnn_tf_4.stngs['tf_log_dir'], sess_dir_name)
         return os.path.realpath(dirty_path)
 
 
     # Parse training data to matrices
     def create_train_data(self):
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cnn']['train_data_path'], cnn_rnn_tf_1.stngs['cnn']['train_data_file']), 'rb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cnn']['train_data_path'], cnn_rnn_tf_4.stngs['cnn']['train_data_file']), 'rb') as f:
           (X, y, speaker_names) = pickle.load(f)
 
         X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.125, 8)
@@ -69,34 +72,34 @@ class cnn_rnn_tf_1(object):
     
     # Create basic net infrastructure
     def create_net(self):
-        cnn_rnn_tf_1.logger.info("Creating placeholders")
+        cnn_rnn_tf_4.logger.info("Creating placeholders")
         with tf.name_scope('Placeholders'):
-            x_input = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1))
-            out_labels = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_1.stngs['segment_size']))
+            x_input = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_4.stngs['frequencies'], cnn_rnn_tf_4.stngs['segment_size'], 1))
+            out_labels = tf.placeholder(tf.float32, shape=(None, cnn_rnn_tf_4.stngs['segment_size']))
 
-        cnn_rnn_tf_1.logger.info("Creating first convolution layer")
+        cnn_rnn_tf_4.logger.info("Creating first convolution layer")
         with tf.name_scope('Convolution_1'):
             conv1 = tf.layers.conv2d(inputs=x_input, filters=32, kernel_size=[8, 1], padding="same", activation=tf.nn.relu)
 
-        cnn_rnn_tf_1.logger.info("Creating first maxpooling layer")
+        cnn_rnn_tf_4.logger.info("Creating first maxpooling layer")
         with tf.name_scope('MaxPooling_1'):
             pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[4, 4], strides=[2, 1])
 
-        cnn_rnn_tf_1.logger.info("Creating second convolution layer")
+        cnn_rnn_tf_4.logger.info("Creating second convolution layer")
         with tf.name_scope('Convolution_2'):
             conv2 = tf.layers.conv2d(inputs=pool1, filters=64, kernel_size=[6, 1], padding="same", activation=tf.nn.relu)
 
-        cnn_rnn_tf_1.logger.info("Creating second maxpooling layer")
+        cnn_rnn_tf_4.logger.info("Creating second maxpooling layer")
         with tf.name_scope('MaxPooling_2'):
             pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[3, 3], strides=[2, 1])
 
-        cnn_rnn_tf_1.logger.info("Creating reshape layer between cnn and gru")
+        cnn_rnn_tf_4.logger.info("Creating reshape layer between cnn and gru")
         with tf.name_scope('Reshape'):
             dim1 = int(pool2.shape[2])
             dim2 = int(pool2.shape[3] * pool2.shape[1])
             lstm_input = tf.reshape(pool2, [-1, dim1, dim2])
 
-        cnn_rnn_tf_1.logger.info("Creating GRU neurons")
+        cnn_rnn_tf_4.logger.info("Creating GRU neurons")
         with tf.name_scope('GRU'):
             x_gru = tf.unstack(lstm_input, lstm_input.get_shape()[1], 1)
             gru_cell = tf.contrib.rnn.GRUCell(256)
@@ -104,29 +107,29 @@ class cnn_rnn_tf_1(object):
             gru_out = dense[-1]
 
 
-        cnn_rnn_tf_1.logger.info("Creating Dense Layer")
+        cnn_rnn_tf_4.logger.info("Creating Dense Layer")
         with tf.name_scope('dense1'):
             dense1 = tf.layers.dense(inputs=gru_out, units=200, activation=tf.nn.relu)
 
 
 
-        cnn_rnn_tf_1.logger.info("Creating softmax layer")
+        cnn_rnn_tf_4.logger.info("Creating softmax layer")
         with tf.name_scope('Softmax'):
-            gru_soft_out = tf.layers.dense(inputs=dense1, units=cnn_rnn_tf_1.stngs['total_speakers'], activation=tf.nn.softmax)
+            gru_soft_out = tf.layers.dense(inputs=dense1, units=cnn_rnn_tf_4.stngs['total_speakers'], activation=tf.nn.softmax)
 
 
         # Cross entropy and optimizer
-        cnn_rnn_tf_1.logger.info("Create optimizer and loss function")
+        cnn_rnn_tf_4.logger.info("Create optimizer and loss function")
         with tf.name_scope('Kld_Optimizer'):
-            cnn_rnn_tf_1.logger.info("Create kld function")
+            cnn_rnn_tf_4.logger.info("Create kld function")
             kld_loss = kld.pairwise_kl_divergence(out_labels, gru_soft_out)
             tf.summary.scalar('kld_loss', kld_loss)
-            cnn_rnn_tf_1.logger.info("Create AdamOptimizer and add kld_loss as minimize function")
+            cnn_rnn_tf_4.logger.info("Create AdamOptimizer and add kld_loss as minimize function")
             optimizer_kld = tf.train.AdamOptimizer().minimize(kld_loss)
 
 
         with tf.name_scope('XE_Optimizer'):
-            cnn_rnn_tf_1.logger.info("Create XE function")
+            cnn_rnn_tf_4.logger.info("Create XE function")
             cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=gru_soft_out, labels=out_labels))
             tf.summary.scalar('loss', cross_entropy)
             optimizer_xe = tf.train.AdamOptimizer().minimize(cross_entropy)
@@ -141,21 +144,21 @@ class cnn_rnn_tf_1(object):
     
     def run_network(self):
         # Create training batches
-        cnn_rnn_tf_1.logger.info("Creating training batches")
+        cnn_rnn_tf_4.logger.info("Creating training batches")
         X_t, y_t, X_v, y_v = self.create_train_data()
-        train_gen = dg.batch_generator(X_t, y_t, batch_size=cnn_rnn_tf_1.stngs['batch_size'], segment_size=cnn_rnn_tf_1.stngs['segment_size'])
-        val_gen = dg.batch_generator(X_v, y_v, batch_size=cnn_rnn_tf_1.stngs['batch_size'], segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+        train_gen = dg.batch_generator(X_t, y_t, batch_size=cnn_rnn_tf_4.stngs['batch_size'], segment_size=cnn_rnn_tf_4.stngs['segment_size'])
+        val_gen = dg.batch_generator(X_v, y_v, batch_size=cnn_rnn_tf_4.stngs['batch_size'], segment_size=cnn_rnn_tf_4.stngs['segment_size'])
         # Create network model and tensors
-        cnn_rnn_tf_1.logger.info("Initialize network model")
+        cnn_rnn_tf_4.logger.info("Initialize network model")
         optimizer_kld, optimizer_xe, gru_soft_out, gru_out, kld_loss, cross_entropy, accuracy, x_input, out_labels, dense1 = self.create_net()
         
         # CNN Training
-        cnn_rnn_tf_1.logger.info("Initialize tensorflow session")
+        cnn_rnn_tf_4.logger.info("Initialize tensorflow session")
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
 
         # Tensorboard
-        cnn_rnn_tf_1.logger.info("Initialize tensorboard dependencies")
+        cnn_rnn_tf_4.logger.info("Initialize tensorboard dependencies")
         tb_merged = tf.summary.merge_all()
         tb_saver = tf.train.Saver()
         tb_log_dir = self.tf_log_dir()
@@ -171,17 +174,17 @@ class cnn_rnn_tf_1(object):
         run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
         run_metadata = tf.RunMetadata()
 
-        csv_file_handler = open(os.path.join(tb_log_dir, (cnn_rnn_tf_1.stngs['csv_file_pfx'] + self.date_time + '.csv')), 'a')
+        csv_file_handler = open(os.path.join(tb_log_dir, (cnn_rnn_tf_4.stngs['csv_file_pfx'] + self.date_time + '.csv')), 'a')
         csv_writer = csv.writer(csv_file_handler)
 
-        cnn_rnn_tf_1.logger.info("Start training")
+        cnn_rnn_tf_4.logger.info("Start training")
         start_time = time.time()
         for step in range(17000):
             # Get next batch
             if step < 15000:
                 x_b_t, y_b = train_gen.next()
                 # Reshape the x_b batch with channel as last dimension
-                x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                x_b = np.reshape(x_b_t, [cnn_rnn_tf_4.stngs['batch_size'], cnn_rnn_tf_4.stngs['frequencies'], cnn_rnn_tf_4.stngs['segment_size'], 1])
                 train_feed_dict = { x_input: x_b, out_labels: y_b }
     
                 # Execute training
@@ -189,11 +192,11 @@ class cnn_rnn_tf_1(object):
                 sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
                 
                 # Validation
-                if step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
+                if step == 0 or (step + 1) % cnn_rnn_tf_4.stngs['validation_calc_interval'] == 0:
                     # Get next batch
                     x_vb_t, y_vb = val_gen.next()
                     # Reshape the x_b batch with channel as last dimension
-                    x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                    x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_4.stngs['batch_size'], cnn_rnn_tf_4.stngs['frequencies'], cnn_rnn_tf_4.stngs['segment_size'], 1])
                     val_feed_dict = { x_input: x_vb, out_labels: y_vb }
     
                     # Execute training
@@ -201,12 +204,12 @@ class cnn_rnn_tf_1(object):
                     val_loss = sess.run(cross_entropy, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
     
                     duration = time.time() - start_time
-                    cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
+                    cnn_rnn_tf_4.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
                     csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
                     start_time = time.time()
     
                 # Write summary data for tensorboard
-                if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
+                if (step + 1) % cnn_rnn_tf_4.stngs['summary_write_interval'] == 0:
                     tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
                     tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
                     tb_train_writer.add_summary(tb_train_summary_str, step)
@@ -217,8 +220,8 @@ class cnn_rnn_tf_1(object):
                     tb_val_writer.add_summary(tb_val_summary_str, step)
                     tb_val_writer.flush()
     
-                if (step + 1) % cnn_rnn_tf_1.stngs['ckpt_write_interval'] == 0:
-                    ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['ckpt_file_pfx'])
+                if (step + 1) % cnn_rnn_tf_4.stngs['ckpt_write_interval'] == 0:
+                    ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_4.stngs['ckpt_file_pfx'])
                     tb_saver.save(sess, ckpt_file, global_step=step)
     
             
@@ -226,7 +229,7 @@ class cnn_rnn_tf_1(object):
             else:
                 x_b_t, y_b = train_gen.next()
                 # Reshape the x_b batch with channel as last dimension
-                x_b = np.reshape(x_b_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                x_b = np.reshape(x_b_t, [cnn_rnn_tf_4.stngs['batch_size'], cnn_rnn_tf_4.stngs['frequencies'], cnn_rnn_tf_4.stngs['segment_size'], 1])
                 train_feed_dict = { x_input: x_b, out_labels: y_b }
     
                 # Execute training
@@ -234,11 +237,11 @@ class cnn_rnn_tf_1(object):
                 sess_acc = sess.run(accuracy, feed_dict=train_feed_dict, options=run_options, run_metadata=run_metadata)
                 
                 # Validation
-                if step == 0 or (step + 1) % cnn_rnn_tf_1.stngs['validation_calc_interval'] == 0:
+                if step == 0 or (step + 1) % cnn_rnn_tf_4.stngs['validation_calc_interval'] == 0:
                     # Get next batch
                     x_vb_t, y_vb = val_gen.next()
                     # Reshape the x_b batch with channel as last dimension
-                    x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_1.stngs['batch_size'], cnn_rnn_tf_1.stngs['frequencies'], cnn_rnn_tf_1.stngs['segment_size'], 1])
+                    x_vb = np.reshape(x_vb_t, [cnn_rnn_tf_4.stngs['batch_size'], cnn_rnn_tf_4.stngs['frequencies'], cnn_rnn_tf_4.stngs['segment_size'], 1])
                     val_feed_dict = { x_input: x_vb, out_labels: y_vb }
     
                     # Execute training
@@ -246,12 +249,12 @@ class cnn_rnn_tf_1(object):
                     val_loss = sess.run(kld_loss, feed_dict=val_feed_dict, options=run_options, run_metadata=run_metadata)
     
                     duration = time.time() - start_time
-                    cnn_rnn_tf_1.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
+                    cnn_rnn_tf_4.logger.info('Round %d (%f s): train_accuracy %f, train_loss %f , val_accuracy %f, val_loss %f', (step + 1), duration, sess_acc, loss_value, val_acc, val_loss)
                     csv_writer.writerow([(step + 1), sess_acc, loss_value, val_acc, val_loss])
                     start_time = time.time()
     
                 # Write summary data for tensorboard
-                if (step + 1) % cnn_rnn_tf_1.stngs['summary_write_interval'] == 0:
+                if (step + 1) % cnn_rnn_tf_4.stngs['summary_write_interval'] == 0:
                     tb_train_summary_str = sess.run(tb_merged, feed_dict=train_feed_dict)
                     tb_train_writer.add_run_metadata(run_metadata, 'step_{:04d}'.format(step))
                     tb_train_writer.add_summary(tb_train_summary_str, step)
@@ -263,179 +266,179 @@ class cnn_rnn_tf_1(object):
                     tb_val_writer.flush()
     
                 if (step + 1) % 1000 == 0:
-                    ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['ckpt_file_pfx'])
+                    ckpt_file = os.path.join(tb_log_dir, cnn_rnn_tf_4.stngs['ckpt_file_pfx'])
                     tb_saver.save(sess, ckpt_file, global_step=step)
 
 
         csv_file_handler.close()
 
         # Save the meta model
-        cnn_rnn_tf_1.logger.info("Saving meta model")
-        model_meta_file = os.path.join(tb_log_dir, cnn_rnn_tf_1.stngs['model_file_name'])
+        cnn_rnn_tf_4.logger.info("Saving meta model")
+        model_meta_file = os.path.join(tb_log_dir, cnn_rnn_tf_4.stngs['model_file_name'])
         tb_saver.save(sess, model_meta_file)
 
         # Evaluate the network
-        cnn_rnn_tf_1.logger.info("Loading train data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_40sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading train data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['train_data_file_40sp']), 'rb') as f:
             (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
-            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         train_net_output = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
         
-        cnn_rnn_tf_1.logger.info("Loading test data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_40sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['test_data_file_40sp']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         test_net_output = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
 
         # Write output file for clustering
-        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_40'] + self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_4.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_train_file_40'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output, train_y_data, train_speaker_names), f, -1)
         
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_40'] + self.date_time +  '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_test_file_40'] + self.date_time +  '.pickle')), 'wb') as f:
             pickle.dump((test_net_output, test_y_data, test_speaker_names), f, -1)
 
 
-        cnn_rnn_tf_1.logger.info("Loading test data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_60sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['test_data_file_60sp']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         test_net_output_60 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
        
-        cnn_rnn_tf_1.logger.info("Loading train data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_60sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading train data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['train_data_file_60sp']), 'rb') as f:
             (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
-            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         train_net_output_60 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
         
-        cnn_rnn_tf_1.logger.info("Loading test data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_60'] + self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_train_file_60'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_60, train_y_data, train_speaker_names), f, -1)
         
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_60'] + self.date_time +  '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_test_file_60'] + self.date_time +  '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_60, test_y_data, test_speaker_names), f, -1)
 
-        cnn_rnn_tf_1.logger.info("Loading test data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['test_data_file_80sp']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         test_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
        
-        cnn_rnn_tf_1.logger.info("Loading train data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading train data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['train_data_file_80sp']), 'rb') as f:
             (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
-            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         train_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
 
 
 
-        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_4.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_train_file_80'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_80, train_y_data, train_speaker_names), f, -1)
         
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_80, test_y_data, test_speaker_names), f, -1)
 
 
         ## dense out
-        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['test_data_file_80sp']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         test_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
        
-        cnn_rnn_tf_1.logger.info("Loading train data for dense evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading train data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['train_data_file_80sp']), 'rb') as f:
             (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
-            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         train_net_output_80 = dense1.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
 
 
 
-        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_80'] +'dense1'+ self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_4.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_train_file_80'] +'dense1'+ self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_80, train_y_data, train_speaker_names), f, -1)
         
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_80'] +'dense1'+ self.date_time + '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_test_file_80'] +'dense1'+ self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_80, test_y_data, test_speaker_names), f, -1)
 
 
-        cnn_rnn_tf_1.logger.info("Loading train data for dense evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_40sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading train data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['train_data_file_40sp']), 'rb') as f:
             (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
-            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         train_net_output = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
         
-        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_40sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['test_data_file_40sp']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         test_net_output = dense1.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
 
         # Write output file for clustering
-        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_40'] +'_dense1_'+ self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_4.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_train_file_40'] +'_dense1_'+ self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output, train_y_data, train_speaker_names), f, -1)
         
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_40'] +'_dense1_'+ self.date_time +  '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_test_file_40'] +'_dense1_'+ self.date_time +  '.pickle')), 'wb') as f:
             pickle.dump((test_net_output, test_y_data, test_speaker_names), f, -1)
 
 
-        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_60sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['test_data_file_60sp']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         test_net_output_60 = dense1.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
        
-        cnn_rnn_tf_1.logger.info("Loading train data for dense evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_60sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading train data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['train_data_file_60sp']), 'rb') as f:
             (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
-            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         train_net_output_60 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
         
-        cnn_rnn_tf_1.logger.info("Loading test data for dense evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_60'] +'_dense1_'+ self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for dense evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_train_file_60'] +'_dense1_'+ self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_60, train_y_data, train_speaker_names), f, -1)
         
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_60'] +'_dense1_'+ self.date_time +  '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_test_file_60'] +'_dense1_'+ self.date_time +  '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_60, test_y_data, test_speaker_names), f, -1)
 
 
 
         
-        cnn_rnn_tf_1.logger.info("Loading test data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['test_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading test data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['test_data_file_80sp']), 'rb') as f:
             (test_raw_x_data, raw_y_data, test_speaker_names) = pickle.load(f)
-            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            test_x_data, test_y_data = dg.generate_test_data(test_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         test_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(test_x_data, [test_x_data.shape[0], test_x_data.shape[2], test_x_data.shape[3], test_x_data.shape[1]])}, session=sess)
        
-        cnn_rnn_tf_1.logger.info("Loading train data for GRU evaluation")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['gru']['data_path'], cnn_rnn_tf_1.stngs['gru']['train_data_file_80sp']), 'rb') as f:
+        cnn_rnn_tf_4.logger.info("Loading train data for GRU evaluation")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['gru']['data_path'], cnn_rnn_tf_4.stngs['gru']['train_data_file_80sp']), 'rb') as f:
             (train_raw_x_data, raw_y_data, train_speaker_names) = pickle.load(f)
-            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_1.stngs['segment_size'])
+            train_x_data, train_y_data = dg.generate_test_data(train_raw_x_data, raw_y_data, segment_size=cnn_rnn_tf_4.stngs['segment_size'])
 
         train_net_output_80 = gru_out.eval(feed_dict={x_input: np.reshape(train_x_data, [train_x_data.shape[0], train_x_data.shape[2], train_x_data.shape[3], train_x_data.shape[1]])}, session=sess)
 
 
 
-        cnn_rnn_tf_1.logger.info("Write outcome to pickle files for clustering")
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_train_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+        cnn_rnn_tf_4.logger.info("Write outcome to pickle files for clustering")
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_train_file_80'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((train_net_output_80, train_y_data, train_speaker_names), f, -1)
         
-        with open(os.path.join(cnn_rnn_tf_1.stngs['cluster_output_path'], (cnn_rnn_tf_1.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
+        with open(os.path.join(cnn_rnn_tf_4.stngs['cluster_output_path'], (cnn_rnn_tf_4.stngs['cluster_output_test_file_80'] + self.date_time + '.pickle')), 'wb') as f:
             pickle.dump((test_net_output_80, test_y_data, test_speaker_names), f, -1)
 
 	cnn_rnn_tf1.logger.info("output genration finished")
