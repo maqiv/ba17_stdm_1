@@ -56,8 +56,6 @@ def pairwise_kl_divergence(labels, predictions):
     return loss
     
 if __name__ == "__main__":
-    with open('/home/patman/pa/1_Code/data/experiments/cluster_outputs/test_for_kld.pickle', 'rb') as f:
-        (X, y, s_list) = pickle.load(f)
 
     epsilon = 1e-16
     test_pred = [[1., 2., 3.], [4., 2., 3.], [6., 3., 2.], [4., 1., 5.], [2., 5., 8.]]
