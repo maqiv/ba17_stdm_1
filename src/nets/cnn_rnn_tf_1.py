@@ -11,6 +11,11 @@ import core.pairwise_kl_divergence as kld
 import core.data_gen as dg
 import cPickle as pickle
 
+'''This Class Trains a Bidirectional LSTM with 2 Layers and a Dropout Layer
+    Parameters:
+    network_settings_file: JSON file that contains network configuration settings
+'''
+
 class cnn_rnn_tf_1(object):
     
     stngs = None

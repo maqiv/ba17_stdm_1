@@ -10,6 +10,28 @@ import tensorflow as tf
 import core.data_gen as dg
 import cPickle as pickle
 
+'''This Class Trains a Bidirectional LSTM with 2 Layers and a Dropout Layer
+    Parameters:
+    network_settings_file: JSON file that contains network configuration settings
+    n_filter1: Dimensions of first convolution filter
+    n_kernel1: Dimensions of first convolution kernel
+    n_pool1: Dimensions of first max-pooling window
+    n_strides1: Dimensions of first max-pooling strides
+    n_filter2: Dimensions of second convolution filter
+    n_kernel2: Dimensions of second convolution kernel
+    n_pool2: Dimensions of second max-pooling window
+    n_strides2: Dimensions of second max-pooling strides
+    n_filter3: Dimensions of third convolution filter
+    n_kernel3: Dimensions of third convolution kernel
+    n_pool3: Dimensions of third max-pooling window
+    n_strides3: Dimensions of third max-pooling strides
+    n_filter4: Dimensions of fourth convolution filter
+    n_kernel4: Dimensions of fourth convolution kernel
+    n_pool4: Dimensions of fourth max-pooling window
+    n_strides4: Dimensions of fourth max-pooling strides
+    n_gru_neurons: Number of units in the GRU layer
+'''
+
 class cnn_rnn_tf_2(object):
 
     stngs = None
