@@ -1,14 +1,11 @@
 import tensorflow as tf
 import numpy as np
 
+'''
+Numpy implementation of the PKLD, for test purposes
+'''
+
 epsilon = 1e-16
-tf_l = tf.Variable(0. , name='loss')
-
-def return_zero():
-    return tf.constant(0.)
-
-def return_one():
-    return tf.constant(1.)
 
 def loss_with_kl_div(P, xp, Q, xq, margin):
     P = P+epsilon
@@ -29,33 +26,12 @@ def loss_with_kl_div(P, xp, Q, xq, margin):
     L = lossPQ + lossQP
     return L	
 
-#def outerLoop(x, tf_l, predictions, labels, margin):
-#    print 'body'
-#    print predictions.get_shape()
-#    print labels.get_shape()
-#
-#    def innerLoop(y,x, tf_l, predictions, labels, margin):
-#        tf_l = tf.add(tf_l, loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin))
-#        y += 1
-#        return y, x, tf_l, predictions, labels, margin
-#   
-#    def innerLoop_cond(y ,x, tf_l, predictions, labels, margin):
-#        return tf.less(y, tf.shape(predictions)[0])
-#
-#    y = tf.constant(0)
-#    res = tf.while_loop(innerLoop_cond, innerLoop, [y,x,tf_l, predictions, labels, margin])
-#    return tf.add(x, 1), res[2], predictions, labels, margin
-#
-#def outerLoop_condition(x, tf_l, predictions, labels, margin):
-#    print "cond"
-#    return tf.less(x, tf.shape(predictions)[0])
-
-
 
 def pairwise_kl_divergence(labels, predictions):
     margin = 2.0
     L_sum = 0.
     for i in range(len(predictions)):
+        j = i+1
         for j in range(len(predictions)):
             L_sum += loss_with_kl_div(predictions[i], labels[i], predictions[j], labels[j], margin)
     return L_sum / (2 * len(predictions))
