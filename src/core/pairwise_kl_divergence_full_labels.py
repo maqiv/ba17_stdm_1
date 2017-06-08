@@ -14,11 +14,9 @@ loss = tf.Variable(0.)
 sum_loss = tf.Variable(0.)
 
 def return_zero():
-    #return tf.add(tf.constant(0.), tf.constant(1e-16))
     return tf.constant(0.)
 
 def return_one():
-    #return tf.add(tf.constant(1.), tf.constant(1e-16))
     return tf.constant(1.)
 
 def loss_with_kl_div(P, Q, same , margin):
@@ -47,8 +45,6 @@ def outerLoop_condition(x, tf_l, predictions, labels, margin):
 def pairwise_kl_divergence(labels, predictions):
     x = tf.constant(0)
     margin = tf.constant(2.)
-    #loss = tf.Variable(0.)
-    #tf_l = tf.Variable(0. , name='loss')
     sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, tf.to_int32(labels), margin], name='outerloop')
     
     pairs = tf.shape(labels)[0]

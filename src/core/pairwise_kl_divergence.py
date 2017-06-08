@@ -38,7 +38,6 @@ def loss_with_kl_div(P, xp, Q, xq, margin):
 
 def outerLoop(x, tf_l, predictions, labels, margin):
     def innerLoop(y, x, tf_l, predictions, labels, margin):
-        #tf.cond(tf.locical_and(tf.equal(xq, xp), tf.less(y, x)),loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero)
         tf_l = tf.add(tf_l, tf.cond(tf.greater(y, x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
         y = tf.add(y, tf.constant(1))
         return y, x, tf_l, predictions, labels, margin
@@ -55,9 +54,6 @@ def outerLoop_condition(x, tf_l, predictions, labels, margin):
 
 def pairwise_kl_divergence(labels, predictions):
     x = tf.constant(0)
-    #margin = tf.constant(2.)
-    #loss = tf.Variable(0.)
-    #tf_l = tf.Variable(0. , name='loss')
     sum_loss = tf.while_loop(outerLoop_condition, outerLoop, [x, tf_l, predictions, labels, margin], swap_memory=True, parallel_iterations = 10, name='outerloop')
     n = tf.constant(100.)
     pairs = tf.multiply(n, tf.divide(tf.subtract(n, tf.constant(1.)), tf.constant(2.)))

@@ -44,7 +44,6 @@ def loss_with_kl_div(P, xp, Q, xq, margin):
 def outerLoop(x, tf_l, predictions, labels, margin):
     with tf.device('/cpu:0'):
         def innerLoop(y, x, tf_l, predictions, labels, margin):
-            #tf.cond(tf.locical_and(tf.equal(xq, xp), tf.less(y, x)),loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero)
             tf_l = tf.add(tf_l, tf.cond(tf.greater(y, x),lambda: loss_with_kl_div(predictions[x], labels[x], predictions[y], labels[y], margin) , return_zero))
             y = tf.add(y, tf.constant(1))
             return y, x, tf_l, predictions, labels, margin
