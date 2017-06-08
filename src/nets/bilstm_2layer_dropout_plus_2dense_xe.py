@@ -25,21 +25,22 @@ import core.pairwise_kl_divergence as kld
     n_hidden1: Units of the first LSTM Layer
     n_hidden2: Units of the second LSTM Layer
     n_classes: Amount of output classes (Speakers in Trainingset)
-    n_epoch: Number of Epochs to train the Network
+    n_10_batches: Number of Minibatches to train the Network (1 = 10 Minibatches)
     segment_size: Segment size that is used as input 100 equals 1 second with current Spectrogram extraction
     frequency: size of the frequency Dimension of the Input Spectrogram
 
 '''
 class bilstm_2layer_dropout(object):
 
-    def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
+    def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_classes=630, n_10_batches=1000, segment_size=15, frequency=128, batch_size ):
         self.network_name = name
         self.training_data = training_data
         self.test_data = 'test'+training_data[5:]
         self.n_hidden1 = n_hidden1
         self.n_hidden2 = n_hidden2
         self.n_classes = n_classes
-        self.n_epoch = n_epoch
+        self.n_10_batches = n_10_batches
+        self.batch_size = batch_size
         self.segment_size = segment_size
         self.input = (segment_size, frequency)
         print self.network_name
@@ -51,7 +52,7 @@ class bilstm_2layer_dropout(object):
         model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden2)))
         model.add(Dense(self.n_classes*10))
-        model.add(Dropout(0.50))
+        model.add(Dropout(0.25))
         model.add(Dense(self.n_classes*5))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
@@ -85,12 +86,10 @@ class bilstm_2layer_dropout(object):
         calls = self.create_callbacks()
         
         X_t, y_t, X_v, y_v = self.create_train_data()
-        train_gen = dg.batch_generator_lstm(X_t, y_t, 100, segment_size=self.segment_size)
-        val_gen = dg.batch_generator_lstm(X_v, y_v, 100, segment_size=self.segment_size)
-        batches_t = ((X_t.shape[0]+128 -1 )// 128) 
-        batches_v = ((X_v.shape[0]+128 -1 )// 128)
+        train_gen = dg.batch_generator_lstm(X_t, y_t, self.batch_size, segment_size=self.segment_size)
+        val_gen = dg.batch_generator_lstm(X_v, y_v, self.batch_size, segment_size=self.segment_size)
         
-        history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_epoch, 
+        history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_10_batches, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
                     validation_steps=2, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)

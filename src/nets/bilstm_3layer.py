@@ -12,7 +12,7 @@ from keras import backend as K
 import tensorflow as tf
 import core.data_gen as dg
 import analysis.data_analysis as da
-tf.python.control_flow_ops = tf
+#tf.python.control_flow_ops = tf
 
 '''This Class Trains a Bidirectional LSTM with 2 Layers and a Dropout Layer
     Parameters:
@@ -22,22 +22,24 @@ tf.python.control_flow_ops = tf
     n_hidden2: Units of the second LSTM Layer
     n_hidden3: Units of the third LSTM Layer
     n_classes: Amount of output classes (Speakers in Trainingset)
-    n_epoch: Number of Epochs to train the Network
+    n_10_batches:  Number of Minibatches to train the Network (1 = 10 Minibatches)
     segment_size: Segment size that is used as input 100 equals 1 second with current Spectrogram extraction
     frequency: size of the frequency Dimension of the Input Spectrogram
 '''
 
 class bilstm_3layer(object):
 
-    def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_hidden3=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
+    def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, 
+                n_hidden3=128, n_classes=630, n_10_batches=1000, segment_size=15, frequency=128, batch_size=100  ):
         self.network_name = name
         self.training_data = training_data
         self.test_data = 'test'+training_data[5:]
         self.n_hidden1 = n_hidden1
         self.n_hidden2 = n_hidden2
         self.n_classes = n_classes
-        self.n_epoch = n_epoch
+        self.n_10_batches = n_10_batches
         self.segment_size = segment_size
+        self.batch_size = batch_size
         self.input = (segment_size, frequency)
         print self.network_name
         self.run_network()
@@ -101,18 +103,16 @@ class bilstm_3layer(object):
         calls = self.create_callbacks()
         
         X_t, y_t, X_v, y_v = self.create_train_data()
-        train_gen = dg.batch_generator_lstm(X_t, y_t, 128, segment_size=self.segment_size)
-        val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
-        batches_t = ((X_t.shape[0]+128 -1 )// 128)*128
-        batches_v = ((X_v.shape[0]+128 -1 )// 128)*128
+        train_gen = dg.batch_generator_lstm(X_t, y_t, self.batch_size, segment_size=self.segment_size)
+        val_gen = dg.batch_generator_lstm(X_v, y_v, self.batch_size, segment_size=self.segment_size)
         
-        history = model.fit_generator(train_gen, batches_t, self.n_epoch, 
+        history = model.fit_generator(train_gen, batches_t, self.n_10_batches, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
                     nb_val_samples=batches_v, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
         self.save_plots( history)
         model.save("../data/experiments/nets/"+self.network_name+".h5")
-        da.calculate_test_acccuracies(self.network_name, self.test_data, True, True, True, segment_size=self.segment_size)    
+        #da.calculate_test_acccuracies(self.network_name, self.test_data, True, True, True, segment_size=self.segment_size)    
 
 
 
