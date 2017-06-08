@@ -7,14 +7,15 @@ import keras
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D, LSTM, GRU
+from keras.layers import LSTM, GRU
 from keras.layers.wrappers import Bidirectional
 from keras.utils import np_utils
 from keras import backend as K
-
 import tensorflow as tf
 import core.data_gen as dg
 import analysis.data_analysis as da
+import core.pairwise_kl_divergence as kld
+#tf.python.control_flow_ops = tf
 
 
 '''This Class Trains a Bidirectional LSTM with 2 Layers and a Dropout Layer
@@ -29,7 +30,7 @@ import analysis.data_analysis as da
     frequency: size of the frequency Dimension of the Input Spectrogram
 
 '''
-class bilstm_2layer_dropout_kld(object):
+class bilstm_2layer_dropout(object):
 
     def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
         self.network_name = name
@@ -49,12 +50,15 @@ class bilstm_2layer_dropout_kld(object):
         model.add(Bidirectional(LSTM(self.n_hidden1, return_sequences=True), input_shape=self.input))
         model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden2)))
+        model.add(Dense(self.n_classes*10))
+        model.add(Dropout(0.50))
+        model.add(Dense(self.n_classes*5))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
-        #adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        ada = keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0)
+        adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        #ada = keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy',
-                    optimizer=ada,
+                    optimizer=adam,
                     metrics=['accuracy'])
         return model
     
@@ -68,8 +72,10 @@ class bilstm_2layer_dropout_kld(object):
     
     
     def create_callbacks(self):
+       
         csv_logger = keras.callbacks.CSVLogger('../data/experiments/logs/'+self.network_name+'.csv')
         net_saver = keras.callbacks.ModelCheckpoint("../data/experiments/nets/"+self.network_name+"_best.h5", monitor='val_loss', verbose=1, save_best_only=True)
+        net_checkpoint = keras.callbacks.ModelCheckpoint("../data/experiments/nets/"+self.network_name+"_{epoch:05d}.h5", period= 100)
         return [csv_logger, net_saver]
     
     
@@ -79,10 +85,10 @@ class bilstm_2layer_dropout_kld(object):
         calls = self.create_callbacks()
         
         X_t, y_t, X_v, y_v = self.create_train_data()
-        train_gen = dg.batch_generator_lstm(X_t, y_t, 128, segment_size=self.segment_size)
-        val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
-        batches_t = ((X_t.shape[0]+128 -1 )// 128)*128
-        batches_v = ((X_v.shape[0]+128 -1 )// 128)*128
+        train_gen = dg.batch_generator_lstm(X_t, y_t, 100, segment_size=self.segment_size)
+        val_gen = dg.batch_generator_lstm(X_v, y_v, 100, segment_size=self.segment_size)
+        batches_t = ((X_t.shape[0]+128 -1 )// 128) 
+        batches_v = ((X_v.shape[0]+128 -1 )// 128)
         
         history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_epoch, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 

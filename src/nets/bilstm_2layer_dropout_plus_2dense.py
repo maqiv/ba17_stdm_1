@@ -9,12 +9,14 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import LSTM, GRU
 from keras.layers.wrappers import Bidirectional
+from keras.layers.normalization import BatchNormalization
 from keras.utils import np_utils
 from keras import backend as K
 import tensorflow as tf
 import core.data_gen as dg
 import analysis.data_analysis as da
 import core.pairwise_kl_divergence as kld
+import core.pairwise_kl_divergence_combined as kldc
 #tf.python.control_flow_ops = tf
 
 
@@ -51,11 +53,13 @@ class bilstm_2layer_dropout(object):
         model.add(Dropout(0.50))
         model.add(Bidirectional(LSTM(self.n_hidden2)))
         model.add(Dense(self.n_classes*10))
-        #model.add(Dropout(0.50))
+        #model.add(Dropout(0.40))
+        model.add(BatchNormalization())
         model.add(Dense(self.n_classes*5))
         model.add(Dense(self.n_classes))
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        #ada = keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0)
         model.compile(loss=kld.pairwise_kl_divergence,
                     optimizer=adam,
                     metrics=['accuracy'])
@@ -71,9 +75,11 @@ class bilstm_2layer_dropout(object):
     
     
     def create_callbacks(self):
+       
         csv_logger = keras.callbacks.CSVLogger('../data/experiments/logs/'+self.network_name+'.csv')
         net_saver = keras.callbacks.ModelCheckpoint("../data/experiments/nets/"+self.network_name+"_best.h5", monitor='val_loss', verbose=1, save_best_only=True)
-        return [csv_logger, net_saver]
+        net_checkpoint = keras.callbacks.ModelCheckpoint("../data/experiments/nets/"+self.network_name+"_{epoch:05d}.h5", period= 100)
+        return [csv_logger, net_saver, net_checkpoint]
     
     
     

@@ -56,7 +56,7 @@ class bilstm_2layer_dropout(object):
         model.add(Activation('softmax'))
         adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         #kld_loss = kld.pairwise_kl_divergence(self.labels_placeholder, self.pred_placeholder)
-        model.compile(loss=kld.pairwise_kl_divergence,
+        model.compile(loss='categorical_crossentropy',
                     optimizer=adam,
                     metrics=['accuracy'])
         return model
@@ -87,20 +87,15 @@ class bilstm_2layer_dropout(object):
         val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
         batches_t = ((X_t.shape[0]+128 -1 )// 128)
         batches_v = ((X_v.shape[0]+128 -1 )// 128)
-        #history = model.fit_generator(train_gen, batches_t, self.n_epoch, 
-        #    verbose=2, callbacks=calls, validation_data=val_gen, 
-        #    nb_val_samples=batches_v, class_weight=None, max_q_size=10, 
-        #    nb_worker=1, pickle_safe=False)
-        history = model.fit_generator(train_gen, steps_per_epoch = 1, epochs = self.n_epoch, 
+        
+        history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_epoch, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
-                    validation_steps=1, class_weight=None, max_q_size=10, 
+                    validation_steps=2, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
         ps.save_accuracy_plot(history, self.network_name)
         ps.save_loss_plot(history, self.network_name)
         print "saving model"
         model.save(settings.NET_PATH+self.network_name+".h5")
-        #print "evaluating model"
-        #da.calculate_test_acccuracies(self.network_name, self.test_data, True, True, True, segment_size=self.segment_size)
 
 
 
