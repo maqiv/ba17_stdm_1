@@ -17,17 +17,16 @@ with tf.device('/cpu:0'):
 
 def return_zero():
     with tf.device('/cpu:0'):
-        return tf.add(tf.constant(0.), tf.constant(1e-8))
-        #return tf.constant(0.)
+        return tf.add(tf.constant(0.), tf.constant(1e-16))
 
 def return_one():
     with tf.device('/cpu:0'):
-        return tf.add(tf.constant(1.), tf.constant(1e-8))
+        return tf.add(tf.constant(1.), tf.constant(1e-16))
         return tf.constant(1.)
 
 def loss_with_kl_div(P, xp, Q, xq, margin):
     with tf.device('/cpu:0'):
-        epsilon = tf.constant(1e-8)
+        epsilon = tf.constant(1e-16)
         P = tf.add(epsilon, P)
         Q = tf.add(epsilon, Q)
     

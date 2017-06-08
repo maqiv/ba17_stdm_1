@@ -14,11 +14,9 @@ loss = tf.Variable(0.)
 sum_loss = tf.Variable(0.)
 
 def return_zero():
-    #return tf.add(tf.constant(0.), tf.constant(1e-16))
     return tf.constant(0.)
 
 def return_one():
-    #return tf.add(tf.constant(1.), tf.constant(1e-16))
     return tf.constant(1.)
 
 def loss_with_kl_div(P, xp, Q, xq, margin):
