@@ -4,7 +4,11 @@ from sklearn import manifold
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import linkage
 
+'''
+Thsi file calculates the MR for a given pair of Cluster Outputs, this code is altered slightly from 
+the Bachelor thesis  of Vogt and Lukic (2016).
 
+'''
 def misclassification_rate(N, e):
     MR = float(e) / N
     #print float(e)
@@ -31,6 +35,11 @@ def increase_error(indices, e, clusters):
 
 
 def calc_MR(X, y, num_speakers, linkage_metric):
+    '''
+    Generates the Hierarchical Cluster based on the Output of generate_speakr_utterances, with the supplied linkage Metric.
+    Based on teh Clustering the MR will be Calculated. Vor the MR calculation an embedding 
+    is worng as soon as there is a non matching embedding in the cluster.
+    '''
     # cityblock, braycurtis,
     from scipy.spatial.distance import cdist
     X = cdist(X, X, linkage_metric)
@@ -70,7 +79,12 @@ def calc_MR(X, y, num_speakers, linkage_metric):
     return MRs
 
 
-def generate_X(train_output, test_output, train_speakers, test_speakers, neuron_number):
+def generate_speaker_utterances(train_output, test_output, train_speakers, test_speakers, neuron_number):
+    '''
+    creates for all Speakers the the Average over their embedings to create an uterance 
+    for a each speaker in the Train set (8 sentences), test set (2 sentences)
+    the two lists get concatinated to create num_speakers *2 list.
+    '''
     num_speakers = len(set(test_speakers))
     print num_speakers
     X_train, y_train = extract_vectors(num_speakers, neuron_number, train_output, train_speakers)
@@ -86,6 +100,9 @@ def generate_X(train_output, test_output, train_speakers, test_speakers, neuron_
 
 
 def load_data(train_file, test_file):
+    '''
+    
+    '''
     with open(train_file, 'rb') as f:
         train_output, train_speakers, train_speaker_names = pickle.load(f)
     with open(test_file, 'rb') as f:
@@ -95,10 +112,10 @@ def load_data(train_file, test_file):
 
 if __name__ == "__main__":
     PATH = '../../data/experiments/cluster_outputs/lstm_2dense/'
-    TRAIN_FILE = '/home/patman/PA_Code/data/experiments/cluster_outputs/cluster_output_train_40sp_2017-06-03_18-28-13.pickle'
-    TEST_FILE = '/home/patman/PA_Code/data/experiments/cluster_outputs/cluster_output_test_40sp_2017-06-03_18-28-13.pickle'
-    #TRAIN_FILE = 'train_cluster_out_40sp__256_500_100sp.pickle'
-    #TEST_FILE = 'test_cluster_out_40sp__256_500_100sp.pickle'
+    #TRAIN_FILE = '/media/sf_patrickgerber/cluster_outputs/cluster_output_test_40sp_dense1__2017-06-04_11-52-16.pickle'
+    #TEST_FILE = '/media/sf_patrickgerber/cluster_outputs/cluster_output_train_40sp_dense1__2017-06-04_11-52-16.pickle'
+    TRAIN_FILE = '/home/patman/PA_Code/data/experiments/cluster_outputs/cluster_output_train_40sp_2017-06-06_22-38-13.pickle'
+    TEST_FILE = '/home/patman/PA_Code/data/experiments/cluster_outputs/cluster_output_test_40sp_2017-06-06_22-38-13.pickle'
     train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
 
 
@@ -106,7 +123,7 @@ if __name__ == "__main__":
     print test_output.shape
     print set(test_speakers)
     print len(set(train_speakers))
-    X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
+    X, y, num_speakers = generate_speaker_utterances(train_output, test_output, train_speakers, test_speakers, 256)
     print len(X)
     ##print len(y)
     ##print num_speakers
@@ -116,21 +133,21 @@ if __name__ == "__main__":
     #TRAIN_FILE = '/home/sebastian/Dokumente/uni/BT/PA_Code/data/experiments/cluster_outputs/cluster_output_train_60sp_2017-05-09_17-25-19.pickle'
     #TEST_FILE = '/home/sebastian/Dokumente/uni/BT/PA_Code/data/experiments/cluster_outputs/cluster_output_test_60sp_2017-05-09_17-25-19.pickle'
     #train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
-    #X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 128)
+    #X, y, num_speakers = generate_speaker_utterances(train_output, test_output, train_speakers, test_speakers, 128)
     #MRs = calc_MR(X, y, num_speakers, 'cosine')
     #plt.plot(MRs, label='60sp', linewidth=2)
 ##
     #TRAIN_FILE = '/home/sebastian/Dokumente/uni/BT/PA_Code/data/experiments/cluster_outputs/cluster_output_train_80sp_2017-05-09_17-25-19.pickle'
     #TEST_FILE = '/home/sebastian/Dokumente/uni/BT/PA_Code/data/experiments/cluster_outputs/cluster_output_test_80sp_2017-05-09_17-25-19.pickle'
     #train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE, TEST_FILE)
-    #X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 128)
+    #X, y, num_speakers = generate_speaker_utterances(train_output, test_output, train_speakers, test_speakers, 128)
     #MRs = calc_MR(X, y, num_speakers, 'cosine')
     #plt.plot(MRs, label='80sp', linewidth=2)
 
     #TRAIN_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/train_cluster_40_kld_lstm2d_layer_lstm_out.pickel'
     #TEST_FILE = '/home/patman/pa/1_Code/data/experiments/cluster_outputs/test_cluster_kld_40_lstm2d_layer_lstm_out.pickel'
     #train_output, test_output, train_speakers, test_speakers = load_data(TRAIN_FILE,TEST_FILE)
-    #X, y, num_speakers = generate_X(train_output, test_output, train_speakers, test_speakers, 512)
+    #X, y, num_speakers = generate_speaker_utterances(train_output, test_output, train_speakers, test_speakers, 512)
     #MRs = calc_MR(X, y, num_speakers, 'cosine')
     #plt.plot(MRs, label='lstm2', linewidth=2)
 

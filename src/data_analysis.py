@@ -25,6 +25,10 @@ write_to_file = True
 
 
 def calculate_test_acccuracies(network_name, one_file, write_to_file):
+    '''calculates the Accuracie scores for the Speaker Identification task 
+        for the Provided Network file.
+
+    '''
     with open('../data/training/TIMIT_extracted/test_data_630.pickle', 'rb') as f:
         (X, y, s_list) = pickle.load(f)
 

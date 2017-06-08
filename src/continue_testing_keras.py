@@ -18,15 +18,29 @@ import core.pairwise_kl_divergence as kld
 from keras.models import load_model
 from keras import backend as K
 
+
+#This class alows to continue training a Keras Network, which was saved as hdf5 model.
+#The class expects the name of the Network, without the extension.
+#The Training Data to be used  as Pickel file
+#T
+
 class continue_testing(object):
-    def __init__(self, name, training_data, n_hidden1=128, n_hidden2=128, n_classes=630, n_epoch=1000, segment_size=15, frequency=128 ):
-        self.network_name = name+'_add_'+str(n_epoch)
+    def __init__(self, name, training_data, num_ten_minibatch=1000, segment_size=50, frequency=128, batch_size = 100 ):
+    	'''
+		This class alows to continue training a Keras Network, which was saved as hdf5 model. it saves the Model with the same name as provided for "name",
+		with the postfix _add{num_ten_minibatches}
+		The class expects the name of the Network, without the extension.
+		The Training Data to be used  as Pickel file
+		the Standard Parameters for num_ten_minibatchs is 1000 (equals 10'000 Minibatches of training)
+		the segment_size for the createt segments in the Minibatch
+    	'''
+        self.network_name = name+'_add_'+str(num_ten_minibatch)
         self.training_data = training_data
         self.test_data = 'test'+training_data[5:]
         self.n_hidden1 = n_hidden1
         self.n_hidden2 = n_hidden2
         self.n_classes = n_classes
-        self.n_epoch = n_epoch
+        self.num_ten_minibatch = num_ten_minibatch
         self.segment_size = segment_size
         self.input = (segment_size, frequency)
         self.load_net = name
@@ -37,7 +51,7 @@ class continue_testing(object):
     
 
 
-    def create_train_data(self):
+  	 def create_train_data(self):
         with open('../data/training/TIMIT_extracted/'+self.training_data, 'rb') as f:
           (X, y, speaker_names) = pickle.load(f)
     
@@ -57,12 +71,9 @@ class continue_testing(object):
 
         calls = self.create_callbacks()
         X_t, y_t, X_v, y_v = self.create_train_data()
-        train_gen = dg.batch_generator_lstm(X_t, y_t, 128, segment_size=self.segment_size)
-        val_gen = dg.batch_generator_lstm(X_v, y_v, 128, segment_size=self.segment_size)
-        batches_t = ((X_t.shape[0]+128 -1 )// 128)
-        print batches_t
-        batches_v = ((X_v.shape[0]+128 -1 )// 128)
-        history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.n_epoch, 
+        train_gen = dg.batch_generator_lstm(X_t, y_t, self.batch_size, segment_size=self.segment_size)
+        val_gen = dg.batch_generator_lstm(X_v, y_v, self.batch_size, segment_size=self.segment_size)
+        history = model.fit_generator(train_gen, steps_per_epoch = 10, epochs = self.num_ten_minibatch, 
                     verbose=2, callbacks=calls, validation_data=val_gen, 
                     validation_steps=5, class_weight=None, max_q_size=10, 
                     nb_worker=1, pickle_safe=False)
@@ -72,5 +83,4 @@ class continue_testing(object):
         model.save(settings.NET_PATH+self.network_name+".h5")
 
 if __name__ == "__main__":
-    #continue_testing('kld_run20170422', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=500, segment_size=50)
-    continue_testing('kld_run20170422_add_500_add_500_add_500_add_500_add_500', 'speakers_100_50w_50m_not_reynolds.pickle', n_hidden1=256, n_hidden2=256, n_classes=100, n_epoch=500, segment_size=50)
+    continue_testing('kld_run20170422_add_500_add_500_add_500_add_500_add_500', 'speakers_100_50w_50m_not_reynolds.pickle', num_ten_minibatch=500, segment_size=50)

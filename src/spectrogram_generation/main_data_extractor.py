@@ -9,11 +9,11 @@ import speaker_train_splitter as sts
 ##### ARGS
 SENTENCES_PER_SPEAKER = 10
 FREQ_ELEMENTS = 128
-MAX_SPEAKERS = 40
+MAX_SPEAKERS = 5
 WITH_SPLIT = True
-SPEAKER_LIST = '../../data/speaker_lists/speakers_40_clustering_vs_reynolds.txt'
-OUTPUT_1 = '../../data/training/TIMIT_extracted/train_speakers_40_clustering_vs_reynolds.pickle'
-OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_40_clustering_vs_reynolds.pickle'
+SPEAKER_LIST = '../../data/speaker_lists/speakers_5_clustering_vs_reynolds_v3.txt'
+OUTPUT_1 = '../../data/training/TIMIT_extracted/train_speakers_5_clustering_vs_reynolds_v3.pickle'
+OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_5_clustering_vs_reynolds_v3.pickle'
 ###########
 
 

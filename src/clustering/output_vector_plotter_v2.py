@@ -1,6 +1,7 @@
 from docutils.nodes import header
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from cluster_tester import generate_X
 
 from sklearn import manifold
 
@@ -75,9 +76,19 @@ if __name__ == '__main__':
             'rb') as f:
         cluster_output, speakers, speaker_names = pickle.load(f)
         print cluster_output.shape[0]
-        colors = generate_colors(speakers, cluster_output.shape[0])
+    with open(
+            '/home/patman/sess_1495747514/cluster_output_test_40sp_2017-05-25_21-23-42.pickle',
+            'rb') as f:
+        cluster_output_02, speakers_02, speaker_names = pickle.load(f)
 
-        plot_vectors(cluster_output, colors, speaker_names)
+        
+
+        X , _ ,_  = generate_X(cluster_output, cluster_output_02, speakers, speakers_02, 256)
+        print len(X)
+
+        colors = generate_colors(speakers, 80)
+
+        plot_vectors(X, colors, speaker_names)
 
         # print speaker_colors[0:1]
         # plt.imshow([(255, 255, 129)], interpolation='none')

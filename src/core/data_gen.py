@@ -53,7 +53,7 @@ def generate_test_data(X, y, segment_size=15):
 
 
 # Batch generator for CNNs
-def batch_generator(X, y, batch_size=128, segment_size=100):
+def batch_generator(X, y, batch_size=100, segment_size=100):
     segments = X.shape[0]
     bs = batch_size
     speakers = np.amax(y)+1
@@ -72,7 +72,9 @@ def batch_generator(X, y, batch_size=128, segment_size=100):
                 Xb[j, 0] = spect[:, seg_idx:seg_idx + segment_size]
             yield Xb, transformy(yb, bs, speakers)
 
-def batch_generator_v2(X, y, batch_size=128, segment_size=100):
+'''creates the a batch for CNN networks, with Pariwise Laabels, 
+for use with core.pairwise_kl_divergence_full_labels'''
+def batch_generator_v2(X, y, batch_size=100, segment_size=100):
     segments = X.shape[0]
     bs = batch_size
     speakers = np.amax(y)+1
@@ -92,7 +94,7 @@ def batch_generator_v2(X, y, batch_size=128, segment_size=100):
             yield Xb, create_pairs(yb)
 
 #Batch generator von LSTMS
-def batch_generator_lstm(X, y, batch_size, segment_size=15):
+def batch_generator_lstm(X, y, batch_size=100, segment_size=15):
     segments = X.shape[0]
     bs = batch_size
     speakers = np.amax(y)+1
@@ -111,7 +113,11 @@ def batch_generator_lstm(X, y, batch_size, segment_size=15):
                 Xb[j, 0] = spect[:, seg_idx:seg_idx + segment_size]
             yield Xb.reshape(bs,segment_size,settings.FREQ_ELEMENTS), transformy(yb, bs, speakers)
 
-def batch_generator_lstm_v2(X, y, batch_size, segment_size=15):
+
+
+'''creates the a batch for LSTM networks, with Pariwise Laabels, 
+for use with core.pairwise_kl_divergence_full_labels'''
+def batch_generator_lstm_v2(X, y, batch_size= 100, segment_size=15):
     segments = X.shape[0]
     bs = batch_size
     speakers = np.amax(y)+1
