@@ -5,6 +5,7 @@ from scipy.spatial.distance import cdist
 import numpy as np
 import cPickle as pickle
 import output_vector_plotter as ovp
+import sys
 
 
 def generate_labels(speakers, speaker_names):
@@ -36,18 +37,18 @@ def extract_vectors(num_speakers, vec_size, vectors, y):
 #with open('data/cluster_5_output_06112015001.pickle', 'rb') as f:
 #    cluster_output, speakers, speaker_names = pickle.load(f)
 
-    TRAIN_FILE = 'train_cluster_out_40sp_500.pickle'
-    TEST_FILE = 'test_cluster_out_40sp_500.pickle'
-with open('../../data/experiments/cluster_outputs/train_cluster_out_40sp__256_500.pickle', 'rb') as f:
+TRAIN_FILE = '/home/sebastian/Dokumente/uni/BT/PA_Code/data/experiments/cluster_outputs/cluster_output_train_40sp_' + sys.argv[2] + '.pickle'
+TEST_FILE = '/home/sebastian/Dokumente/uni/BT/PA_Code/data/experiments/cluster_outputs/cluster_output_test_40sp_' + sys.argv[2] + '.pickle'
+with open(TEST_FILE, 'rb') as f:
     test_output, test_speakers, speaker_names = pickle.load(f)
 
-with open('../../data/experiments/cluster_outputs/test_cluster_out_40sp__256_500.pickle', 'rb') as f:
+with open(TRAIN_FILE, 'rb') as f:
     train_output, train_speakers, _ = pickle.load(f)
 
 NUM_SPEAKERS = len(speaker_names)
 
-X_train, y_train = extract_vectors(NUM_SPEAKERS, 512, train_output, train_speakers)
-X_test, y_test = extract_vectors(NUM_SPEAKERS, 512, test_output, test_speakers)
+X_train, y_train = extract_vectors(NUM_SPEAKERS, int(sys.argv[1]), train_output, train_speakers)
+X_test, y_test = extract_vectors(NUM_SPEAKERS, int(sys.argv[1]), test_output, test_speakers)
 X = []
 X.extend(X_train)
 X.extend(X_test)
@@ -88,10 +89,11 @@ for i in range(len(Z)):
 
 matplotlib.rcParams['lines.linewidth'] = 4
 plt.figure(figsize=(25, 10))
-plt.xlabel('speaker name', fontsize=18)
-plt.ylabel('distance', fontsize=18)
+plt.xlabel('Sprecher', fontsize=18)
+plt.ylabel('Distanz', fontsize=18)
+plt.axhline(y=0.01055, c='k')
 plt.tick_params(labelsize=18)
-dendrogram(Z, leaf_rotation=45., leaf_font_size=18., show_contracted=True, link_color_func=lambda x: color[x], labels=generate_labels(speakers, speaker_names))
+dendrogram(Z, leaf_rotation=90., leaf_font_size=10., show_contracted=True, link_color_func=lambda x: color[x], labels=generate_labels(speakers, speaker_names))
 
 ax = plt.gca()
 x_labels = ax.get_xmajorticklabels()

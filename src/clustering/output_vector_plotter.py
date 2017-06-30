@@ -31,7 +31,7 @@ def plot_vectors(X, colors, speaker_names):
     for i in range(len(set(colors))):
         speaker_entries = colors.count(colors[globalCount])
         plt.scatter(Y[globalCount:globalCount + speaker_entries, 0], Y[globalCount:globalCount + speaker_entries, 1],
-                    c=colors[globalCount], label=speaker_names[i], s=40)
+                    c=colors[globalCount], label=speaker_names[i], s=40, edgecolor='b', lw=0.5)
         globalCount += speaker_entries
         plt.xlabel('x')
         plt.ylabel('y')
@@ -71,7 +71,7 @@ def generate_colors(speakers, length):
 
 if __name__ == '__main__':
     with open(
-            '/home/patman/sess_1495747514/cluster_output_train_40sp_2017-05-25_21-23-42.pickle',
+            '/home/sebastian/Dokumente/uni/BT/PA_Code/data/experiments/cluster_outputs/1495747514_train_speakers_5_clustering_vs_reynolds_v3.pickle',
             'rb') as f:
         cluster_output, speakers, speaker_names = pickle.load(f)
         print cluster_output.shape[0]
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
         plot_vectors(cluster_output, colors, speaker_names)
 
-        # print speaker_colors[0:1]
-        # plt.imshow([(255, 255, 129)], interpolation='none')
-        # plt.legend('speaker 1')
-        # plt.show()
+        print speaker_colors[0:1]
+        plt.imshow([(255, 255, 129)], interpolation='none')
+        plt.legend('speaker 1')
+        plt.show()

@@ -12,15 +12,17 @@ FREQ_ELEMENTS = 128
 MAX_SPEAKERS = 5
 WITH_SPLIT = True
 SPEAKER_LIST = '../../data/speaker_lists/speakers_5_clustering_vs_reynolds_v3.txt'
-OUTPUT_1 = '../../data/training/TIMIT_extracted/train_speakers_5_clustering_vs_reynolds_v3.pickle'
-OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_5_clustering_vs_reynolds_v3.pickle'
+#OUTPUT_1 = '../../data/training/TIMIT_extracted/train_speakers_5_clustering_vs_reynolds_v3.pickle'
+#OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_5_clustering_vs_reynolds_v3.pickle'
+OUTPUT_1 = '../../data/training/TIMIT_extracted/train_speakers_5_clustering_vs_reynolds.pickle'
+OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_5_clustering_vs_reynolds.pickle'
 ###########
 
 
 ONE_SEC = 100 # array elements corresponding to one sec
 STEP_SIZE = 100
 SPECT_DIMENSION = (FREQ_ELEMENTS, ONE_SEC)
-MAX_AUDIO_LENGTH = 800
+MAX_AUDIO_LENGTH = 100
 
 extractor = de.DataExtractor(MAX_SPEAKERS, ONE_SEC, STEP_SIZE, SPECT_DIMENSION)
 #X = np.zeros((MAX_SPEAKERS*1000, 1, SPECT_DIMENSION[0], SPECT_DIMENSION[1]), dtype=np.float32)
