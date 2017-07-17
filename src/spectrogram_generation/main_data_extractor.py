@@ -16,8 +16,6 @@ SPEAKER_LIST = '../../data/speaker_lists/speakers_5_clustering_vs_reynolds_v3.tx
 #OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_5_clustering_vs_reynolds_v3.pickle'
 OUTPUT_1 = '../../data/training/TIMIT_extracted/train_speakers_5_clustering_vs_reynolds.pickle'
 OUTPUT_2 = '../../data/training/TIMIT_extracted/test_speakers_5_clustering_vs_reynolds.pickle'
-###########
-
 
 ONE_SEC = 100 # array elements corresponding to one sec
 STEP_SIZE = 100
