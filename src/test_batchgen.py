@@ -10,6 +10,11 @@ import core.data_gen as dg
 import core.pairwise_kl_divergence_np as pkld
 import cPickle as pickle
 
+''' 
+checks the generated batch for the amount of paris from the same speaker.
+
+'''
+
 with open('/home/patman/pa/1_Code/data/training/TIMIT_extracted/speakers_100_50w_50m_not_reynolds.pickle', 'rb') as f:
 	(X, y, speaker_names) = pickle.load(f)
 X_t, X_v, y_t, y_v = dg.splitter(X, y, 0.125, 8)
