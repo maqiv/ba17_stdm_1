@@ -12,7 +12,6 @@ Processing (Training):
 Post-Processing:
 - `src/keras_cluster_output_generator.py`: Execute clustering procedure on appropriate extracted speaker data with the previously trained network (-model)
 - `src/clustering/cluster_tester.py`: Calculate missclassification rate and optionally show a scatter plot for processed clusterings
-- `src/data_analysis.py`: ....
 
 ### Required folder structure
 * data/experiments/logs/
@@ -21,12 +20,3 @@ Post-Processing:
 * data/speaker_lists/
 * data/training/TIMIT/
 * data/training/TIMIT_extracted/
-
-### Used Python libraries (obsolete)
-* numpy 1.12.0
-* tensorflow 1.0.1
-* keras 1.0
-* scipy 0.16.1
-* h5py 2.6.0
-* matplotlib 2.0.0
-* librosa 0.5.0
