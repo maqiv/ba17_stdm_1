@@ -11,7 +11,7 @@ import core.pairwise_kl_divergence_np as pkld
 import cPickle as pickle
 
 ''' 
-checks the generated batch for the amount of paris from the same speaker.
+checks the generated batch for the amount of pairs from the same speaker.
 
 '''
 
