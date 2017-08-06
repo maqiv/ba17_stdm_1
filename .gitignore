@@ -1,0 +1,25 @@
+# logs and training Data
+data/
+!data/speaker_lists
+
+######## Python ########
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Jupyter Notebook files
+*.ipynb
+.ipynb_checkpoints
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+
+######## MacOS files ########
+.DS_Store
